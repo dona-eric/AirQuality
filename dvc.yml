@@ -1,0 +1,16 @@
+# dvc.yml pour la suivie de controle de versin des données
+# chaque stage ne se ré-exécute si les deps changent
+# dvc repro pour la reproductible du pipeline
+
+
+stages:
+
+  extract:
+    cmd: python3 src/etl/meteo.py && python3 src/etl/quality_air.py
+    deps:
+      - src/etl/meteo.py
+      - src/etl/quality_air.py
+    outs:
+      - data/raw/hourly_meteo_data.csv
+      - data/raw/hourly_quality_air_data.csv
+    desc: "Collecte des données météorologiques et la qualité d'air depuis l'API de méteo sur open-météo"
