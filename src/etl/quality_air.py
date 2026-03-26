@@ -24,8 +24,8 @@ from retry_requests import retry
 # CONFIG
 
 LATITUDE, LONGITUDE = 6.4969, 2.6289  # Cotonou, Bénin
-INTERVAL_H    =  48         # Fréquence de mise à jour (heures)
-BACKFILL_FROM = "2025-11-30"    # Date de début historique
+INTERVAL_H    =  24         # Fréquence de mise à jour (heures)
+BACKFILL_FROM = "2025-09-30"    # Date de début historique
 DB_PATH = pathlib.Path("data/air_quality.db")
 CSV_PATH = pathlib.Path("data/raw/hourly_quality_air_data.csv")
 LOG_PATH = pathlib.Path("logs/collect.log")
