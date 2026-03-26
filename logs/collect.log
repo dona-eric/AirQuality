@@ -123,3 +123,31 @@
 2026-03-24 17:46:48,770 - apscheduler.executors.default - INFO - Job "collect_and_refresh (trigger: interval[0:02:00], next run at: 2026-03-24 16:48:48 UTC)" executed successfully
 2026-03-24 17:47:00,226 - __main__ - INFO - Arrêt demandé — shutdown propre
 2026-03-24 17:47:00,226 - apscheduler.scheduler - INFO - Scheduler has been shut down
+2026-03-25 13:40:32,819 - __main__ - INFO - ╔══════════════════════════════════════╗
+2026-03-25 13:40:32,822 - __main__ - INFO - ║  Collecteur Qualité d'Air — Cotonou  ║
+2026-03-25 13:40:32,822 - __main__ - INFO - ╚══════════════════════════════════════╝
+2026-03-25 13:40:32,823 - __main__ - INFO - ✓ Base de données prête
+2026-03-25 13:40:32,824 - __main__ - INFO - Dernière date en base : 2026-03-24 → collecte depuis 2026-03-25
+2026-03-25 13:40:32,824 - __main__ - INFO - === Collecte 2026-03-25 → 2026-03-25 ===
+2026-03-25 13:40:34,368 - __main__ - INFO - Données reçues : 24 lignes (2026-03-25 → 2026-03-25)
+2026-03-25 13:40:34,392 - __main__ - INFO - ✓ Insertion BD : 24 lignes (doublons ignorés)
+2026-03-25 13:40:34,568 - __main__ - INFO - ✓ Export CSV : data/raw/hourly_quality_air_data.csv
+2026-03-25 13:40:34,568 - __main__ - INFO - === Collecte terminée ===
+2026-03-25 13:40:34,571 - apscheduler.scheduler - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2026-03-25 13:40:34,571 - apscheduler.scheduler - INFO - Added job "collect_and_refresh" to job store "default"
+2026-03-25 13:40:34,572 - apscheduler.scheduler - INFO - Scheduler started
+2026-03-25 13:40:34,572 - __main__ - INFO - Scheduler démarré — prochaine collecte : 2026-03-26 12:40:34.568953+00:00
+2026-03-25 13:40:35,950 - __main__ - INFO - Arrêt demandé — shutdown propre
+2026-03-25 13:40:35,950 - apscheduler.scheduler - INFO - Scheduler has been shut down
+2026-03-25 13:40:47,719 - __main__ - INFO - ╔══════════════════════════════════════╗
+2026-03-25 13:40:47,719 - __main__ - INFO - ║  Collecteur Qualité d'Air — Cotonou  ║
+2026-03-25 13:40:47,719 - __main__ - INFO - ╚══════════════════════════════════════╝
+2026-03-25 13:40:47,720 - __main__ - INFO - ✓ Base de données prête
+2026-03-25 13:40:47,720 - __main__ - INFO - Dernière date en base : 2026-03-25 → collecte depuis 2026-03-26
+2026-03-25 13:40:47,720 - __main__ - INFO - Données déjà à jour (start=2026-03-26 > end=2026-03-25) — rien à faire
+2026-03-25 13:40:47,721 - apscheduler.scheduler - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2026-03-25 13:40:47,721 - apscheduler.scheduler - INFO - Added job "collect_and_refresh" to job store "default"
+2026-03-25 13:40:47,722 - apscheduler.scheduler - INFO - Scheduler started
+2026-03-25 13:40:47,722 - __main__ - INFO - Scheduler démarré — prochaine collecte : 2026-03-26 12:40:47.721173+00:00
+2026-03-25 14:19:37,844 - __main__ - INFO - Arrêt demandé — shutdown propre
+2026-03-25 14:19:37,845 - apscheduler.scheduler - INFO - Scheduler has been shut down
