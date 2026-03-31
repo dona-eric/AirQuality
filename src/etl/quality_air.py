@@ -24,7 +24,7 @@ from retry_requests import retry
 # CONFIG
 
 LATITUDE, LONGITUDE = 6.4969, 2.6289  # Cotonou, Bénin
-INTERVAL_H    =  24         # Fréquence de mise à jour (heures)
+INTERVAL_MIN    =  20         # Fréquence de mise à jour (heures)
 BACKFILL_FROM = "2025-09-30"    # Date de début historique
 DB_PATH = pathlib.Path("data/air_quality.db")
 CSV_PATH = pathlib.Path("data/raw/hourly_quality_air_data.csv")
@@ -274,11 +274,11 @@ def start_scheduler():
     scheduler.add_job(
         func=collect_and_refresh,     # fonction à appeler
         trigger="interval",           # type de déclencheur : intervalle fixe
-        hours=INTERVAL_H,             # toutes les 48 heures
+        minutes=INTERVAL_MIN,             # toutes les 48 heures
         id="air_quality_refresh",     # identifiant unique (utile pour déboguer)
         max_instances=1,              # empêche deux collectes simultanées
         coalesce=True,                # si le programme était éteint, ne rattrape qu'une seule fois
-        next_run_time=datetime.now(timezone.utc) + timedelta(hours=INTERVAL_H),
+        next_run_time=datetime.now(timezone.utc) + timedelta(minutes=INTERVAL_MIN),
         
     )
  
