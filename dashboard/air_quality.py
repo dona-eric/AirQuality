@@ -818,6 +818,10 @@ def section(title):
 
 app = dash.Dash(__name__, title="Indice de la Qualité d'Air à Cotonou", suppress_callback_exceptions=True)
 
+# server
+
+server = app.server
+
 app.layout = html.Div(
     style={"fontFamily":"system-ui,-apple-system,sans-serif",
            "background":C["bg"],"minHeight":"100vh",
