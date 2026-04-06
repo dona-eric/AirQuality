@@ -6,12 +6,18 @@ Données : Open-Meteo Air Quality API — Sept 2025 → Mars 2026
 
 """
 
+from turtle import st
+
+from turtle import st
+
+from fastapi import requests
 import numpy as np
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import pathlib
+import requests
 import dash
 from dash import dcc, html, Input, Output, callback
 import logging
@@ -61,6 +67,30 @@ except Exception as e:
 df["saison"] = df["month"].apply(
     lambda m: "Harmattan (Déc-Fév)" if m in [12, 1, 2] else "Saison pluvieuse (Mar+)"
 )
+
+
+
+
+#================================= PREDICTION ======================================
+
+def prediction():
+    api_url = "http://127.0.0.1:8000"
+
+    try:
+    # Appel à l'endpoint de prédiction
+        response = requests.post(f"{api_url}/predict")
+        if response.status_code == 200:
+            data = response.json()
+            Prevision = f"{data['predicted_pm25']} µg/m³"
+            PM2_5_Actual= f"{data['current_pm25']} µg/m³"
+            return Prevision, PM2_5_Actual
+        else:
+            logger.error("Erreur lors de la connexion à l'API de prédiction.")
+    except Exception as e:
+        logger.warning("L'API n'est pas encore lancée.")
+
+prevision, pm2_5_actual = prediction()
+
 
 # Détection anomalies IsolationForest
 ANOMALY_COLS = ["pm2_5", "pm10", "ozone", "nitrogen_dioxide"]
@@ -166,11 +196,11 @@ peaks = (df[df["european_aqi"] > 60].groupby("date_str")["european_aqi"].max().s
 
 C = {
     "coral":  "#F0CF4C", "blue":   "#4463DB",
-    "teal":   "#1E7E73", "amber":  "#DDE97E",
+    "teal":   "#1E7E73", "amber":  "#62D47B",
     "purple": "#7F6B95", "gray":   "#7A80A7",
-    "green":  "#6BCB77", "red":    "#EF4545",
-    "bg":     "#F5F7FA", "card":   "#FFFFFF",
-    "border": "#839AE0", "text":   "#2C3E50",
+    "green":  "#5DB4A8", "red":    "#D83535",
+    "bg":     "#EAF2ECD6", "card":   "#FCFFFEF8",
+    "border": "#7F90C2", "text":   "#2C3E50",
     "text2":  "#060606", "accent": "#FF6B6B",
 }
 
@@ -752,9 +782,9 @@ def fig_oms_gauges() -> go.Figure:
     Donne une lecture immédiate de l'état sanitaire.
     """
     polluants = [
-        ("PM2.5", pm2_5_mean, OMS["pm2_5"],          C["coral"]),
-        ("PM10",  pm_10_mean,  OMS["pm10"],            C["amber"]),
-        ("Ozone", O3_mean,    OMS["ozone"],           C["teal"]),
+        ("PM2.5", pm2_5_mean, OMS["pm2_5"],  C["coral"]),
+        ("PM10",  pm_10_mean,  OMS["pm10"],  C["amber"]),
+        ("Ozone", O3_mean,    OMS["ozone"],  C["teal"]),
         ("NO₂",   no2_mean,   OMS["nitrogen_dioxide"],C["blue"]),
     ]
     fig = make_subplots(rows=1, cols=4,
@@ -791,7 +821,7 @@ def fig_oms_gauges() -> go.Figure:
  
     fig.update_layout(
         template=TEMPLATE, height=340,
-        margin=dict(l=20, r=20, t=40, b=10),
+        margin=dict(l=20, r=20, t=40, b=20),
     )
     return fig
  
@@ -810,20 +840,20 @@ def section(title):
         html.Span("▸", style={"color":C["accent"],"marginRight":"8px","fontSize":"14px"}),
         html.Span(title, style={"fontWeight":"700","color":C["text"]}),
     ], style={
-        "fontSize":"14px","fontWeight":"700","color":C["text"],
-        "letterSpacing":"0.5px","marginBottom":"16px","marginTop":"28px",
+        "fontSize":"15px","fontWeight":"700","color":C["text"],
+        "letterSpacing":"1.5px","marginBottom":"16px","marginTop":"28px",
         "display":"flex","alignItems":"center","paddingBottom":"12px",
         "borderBottom":f"2px solid {C['border']}",
     })
 
-app = dash.Dash(__name__, title="Indice de la Qualité d'Air à Cotonou", suppress_callback_exceptions=True)
+app = dash.Dash(__name__, 
+                title="Indice de la Qualité d'Air à Cotonou",
+                suppress_callback_exceptions=True,
+                server=True,include_pages_meta= True,)
 
-# server
-
-server = app.server
 
 app.layout = html.Div(
-    style={"fontFamily":"system-ui,-apple-system,sans-serif",
+    style={"font-family": " 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Ubuntu Condensed",
            "background":C["bg"],"minHeight":"100vh",
            "padding":"24px","color":C["text"]},
     children=[
@@ -836,6 +866,7 @@ app.layout = html.Div(
 
         #  KPIs 
         html.Div([
+            kpi_card('AQI Prédite', f"{prevision}", f"PM2.5 Actuel ={pm2_5_actual}", C["purple"] ),
             kpi_card("AQI",  f"{AQI}", aqi_label, aqi_color),
             kpi_card("PM2.5 moyen",      f"{pm2_5_mean} μg/m³", f"P95 = {pm2_5_p95}", C["blue"]),
             kpi_card("Niveau dominant",  
@@ -847,6 +878,12 @@ app.layout = html.Div(
             kpi_card("Anomalies",       f"{n_anomalies} h",   "IsolationForest 5%",           C["red"]),
         ], style={"display":"flex","gap":"14px","marginBottom":"28px","flexWrap":"wrap"}),
 
+        section("DÉPASSEMENT DES SEUILS OMS"),
+            html.Div([
+                html.P("Valeurs moyennes vs Seuils OMS: Rouge = Dépassement",
+                    style={"fontSize":"12px","fontWeight":"500","color":C["text2"],"marginBottom":"10px"}),
+                dcc.Graph(figure=fig_oms_gauges(), config={"displayModeBar":False}),
+            ], style=CARD_STYLE),
 
         # Distribution AQI + Mensuel
         section("DISTRIBUTION AQI & TENDANCE MENSUELLE"),
@@ -900,14 +937,6 @@ app.layout = html.Div(
                     style={"fontSize":"12px","fontWeight":"500","color":C["text2"],"marginBottom":"10px"}
                     ),
                 dcc.Graph(figure=fig_streamgraph(), config={"displayModeBar":False}),
-            ], style=CARD_STYLE),
-
-
-        section("DÉPASSEMENT DES SEUILS OMS"),
-            html.Div([
-                html.P("Valeurs moyennes vs Seuils OMS: Rouge = Dépassement",
-                    style={"fontSize":"12px","fontWeight":"500","color":C["text2"],"marginBottom":"10px"}),
-                dcc.Graph(figure=fig_oms_gauges(), config={"displayModeBar":False}),
             ], style=CARD_STYLE),
 
     
@@ -1033,6 +1062,9 @@ def update_matrix(variable):
 
 if __name__ == "__main__":
     print("\n" + "="*55)
-    print("  Dashboard :Qualité d'air Cotonou")
+    print("Dashboard: Qualité d'air Cotonou")
     print("="*55 + "\n")
-    app.run(debug=True, host="127.0.0.1", port=8081)
+    app.run(
+        debug=True, 
+        host="127.0.0.1", 
+        port=8081, dev_tools_ui=True,)
