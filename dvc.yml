@@ -14,3 +14,6 @@ stages:
       - data/raw/hourly_meteo_data.csv
       - data/raw/hourly_quality_air_data.csv
     desc: "Collecte des données météorologiques et la qualité d'air depuis l'API de méteo sur open-météo"
+
+  dashboard:
+    cmd: python3 dashboard/air_quality.py
