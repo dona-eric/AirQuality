@@ -1509,3 +1509,142 @@
 2026-04-06 16:08:25,723 - __main__ - INFO - =========== TRANFORMATION DES DONNÉES SUCCESSFUL=============
 2026-04-06 16:08:26,006 - __main__ - INFO - =========== DEFINITION DU AQI LABEL =============
 2026-04-06 16:08:26,008 - __main__ - INFO - Calcul statistiques des PM et AQI selon les normes OMS
+2026-04-06 16:27:55,743 - __main__ - INFO - ╔══════════════════════════════════════╗
+2026-04-06 16:27:55,745 - __main__ - INFO - ║  Dashboard on Quality Air — Cotonou  ║
+2026-04-06 16:27:55,745 - __main__ - INFO - ╚══════════════════════════════════════╝
+2026-04-06 16:27:55,745 - __main__ - INFO - 1. CHARGEMENT & PRÉPARATION
+2026-04-06 16:27:55,839 - __main__ - INFO - =========== TRANFORMATION DES DONNÉES SUCCESSFUL=============
+2026-04-06 16:27:56,332 - __main__ - INFO - =========== DEFINITION DU AQI LABEL =============
+2026-04-06 16:27:56,334 - __main__ - INFO - Calcul statistiques des PM et AQI selon les normes OMS
+2026-04-06 16:33:22,568 - __main__ - INFO - ╔══════════════════════════════════════╗
+2026-04-06 16:33:22,568 - __main__ - INFO - ║  Dashboard on Quality Air — Cotonou  ║
+2026-04-06 16:33:22,568 - __main__ - INFO - ╚══════════════════════════════════════╝
+2026-04-06 16:33:22,569 - __main__ - INFO - 1. CHARGEMENT & PRÉPARATION
+2026-04-06 16:33:22,658 - __main__ - INFO - =========== TRANFORMATION DES DONNÉES SUCCESSFUL=============
+2026-04-06 16:33:22,936 - __main__ - INFO - =========== DEFINITION DU AQI LABEL =============
+2026-04-06 16:33:22,938 - __main__ - INFO - Calcul statistiques des PM et AQI selon les normes OMS
+2026-04-06 16:41:02,411 - __main__ - INFO - ╔══════════════════════════════════════╗
+2026-04-06 16:41:02,412 - __main__ - INFO - ║  Dashboard on Quality Air — Cotonou  ║
+2026-04-06 16:41:02,412 - __main__ - INFO - ╚══════════════════════════════════════╝
+2026-04-06 16:41:02,412 - __main__ - INFO - 1. CHARGEMENT & PRÉPARATION
+2026-04-06 16:41:02,503 - __main__ - INFO - =========== TRANFORMATION DES DONNÉES SUCCESSFUL=============
+2026-04-06 16:41:02,779 - __main__ - INFO - =========== DEFINITION DU AQI LABEL =============
+2026-04-06 16:41:02,780 - __main__ - INFO - Calcul statistiques des PM et AQI selon les normes OMS
+2026-04-06 16:43:13,571 - __main__ - INFO - ╔══════════════════════════════════════╗
+2026-04-06 16:43:13,571 - __main__ - INFO - ║  Dashboard on Quality Air — Cotonou  ║
+2026-04-06 16:43:13,571 - __main__ - INFO - ╚══════════════════════════════════════╝
+2026-04-06 16:43:13,572 - __main__ - INFO - 1. CHARGEMENT & PRÉPARATION
+2026-04-06 16:43:13,649 - __main__ - INFO - =========== TRANFORMATION DES DONNÉES SUCCESSFUL=============
+2026-04-06 16:43:13,944 - __main__ - INFO - =========== DEFINITION DU AQI LABEL =============
+2026-04-06 16:43:13,946 - __main__ - INFO - Calcul statistiques des PM et AQI selon les normes OMS
+2026-04-06 16:45:01,860 - __main__ - INFO - ╔══════════════════════════════════════╗
+2026-04-06 16:45:01,861 - __main__ - INFO - ║  Dashboard on Quality Air — Cotonou  ║
+2026-04-06 16:45:01,861 - __main__ - INFO - ╚══════════════════════════════════════╝
+2026-04-06 16:45:01,861 - __main__ - INFO - 1. CHARGEMENT & PRÉPARATION
+2026-04-06 16:45:01,945 - __main__ - INFO - =========== TRANFORMATION DES DONNÉES SUCCESSFUL=============
+2026-04-06 16:45:02,243 - __main__ - INFO - =========== DEFINITION DU AQI LABEL =============
+2026-04-06 16:45:02,245 - __main__ - INFO - Calcul statistiques des PM et AQI selon les normes OMS
+2026-04-06 16:45:23,766 - __main__ - INFO - ╔══════════════════════════════════════╗
+2026-04-06 16:45:23,766 - __main__ - INFO - ║  Dashboard on Quality Air — Cotonou  ║
+2026-04-06 16:45:23,766 - __main__ - INFO - ╚══════════════════════════════════════╝
+2026-04-06 16:45:23,766 - __main__ - INFO - 1. CHARGEMENT & PRÉPARATION
+2026-04-06 16:45:23,856 - __main__ - INFO - =========== TRANFORMATION DES DONNÉES SUCCESSFUL=============
+2026-04-06 16:45:24,131 - __main__ - INFO - =========== DEFINITION DU AQI LABEL =============
+2026-04-06 16:45:24,133 - __main__ - INFO - Calcul statistiques des PM et AQI selon les normes OMS
+2026-04-06 16:48:20,317 - __main__ - INFO - ╔══════════════════════════════════════╗
+2026-04-06 16:48:20,317 - __main__ - INFO - ║  Dashboard on Quality Air — Cotonou  ║
+2026-04-06 16:48:20,317 - __main__ - INFO - ╚══════════════════════════════════════╝
+2026-04-06 16:48:20,317 - __main__ - INFO - 1. CHARGEMENT & PRÉPARATION
+2026-04-06 16:48:20,392 - __main__ - INFO - =========== TRANFORMATION DES DONNÉES SUCCESSFUL=============
+2026-04-06 16:48:20,764 - __main__ - INFO - =========== DEFINITION DU AQI LABEL =============
+2026-04-06 16:48:20,776 - __main__ - INFO - Calcul statistiques des PM et AQI selon les normes OMS
+2026-04-06 16:51:39,108 - __main__ - INFO - ╔══════════════════════════════════════╗
+2026-04-06 16:51:39,108 - __main__ - INFO - ║  Dashboard on Quality Air — Cotonou  ║
+2026-04-06 16:51:39,108 - __main__ - INFO - ╚══════════════════════════════════════╝
+2026-04-06 16:51:39,108 - __main__ - INFO - 1. CHARGEMENT & PRÉPARATION
+2026-04-06 16:51:39,196 - __main__ - INFO - =========== TRANFORMATION DES DONNÉES SUCCESSFUL=============
+2026-04-06 16:51:39,467 - __main__ - INFO - =========== DEFINITION DU AQI LABEL =============
+2026-04-06 16:51:39,469 - __main__ - INFO - Calcul statistiques des PM et AQI selon les normes OMS
+2026-04-06 16:53:08,841 - __main__ - INFO - ╔══════════════════════════════════════╗
+2026-04-06 16:53:08,841 - __main__ - INFO - ║  Dashboard on Quality Air — Cotonou  ║
+2026-04-06 16:53:08,841 - __main__ - INFO - ╚══════════════════════════════════════╝
+2026-04-06 16:53:08,842 - __main__ - INFO - 1. CHARGEMENT & PRÉPARATION
+2026-04-06 16:53:08,925 - __main__ - INFO - =========== TRANFORMATION DES DONNÉES SUCCESSFUL=============
+2026-04-06 16:53:09,199 - __main__ - INFO - =========== DEFINITION DU AQI LABEL =============
+2026-04-06 16:53:09,201 - __main__ - INFO - Calcul statistiques des PM et AQI selon les normes OMS
+2026-04-06 16:53:49,766 - __main__ - INFO - ╔══════════════════════════════════════╗
+2026-04-06 16:53:49,767 - __main__ - INFO - ║  Dashboard on Quality Air — Cotonou  ║
+2026-04-06 16:53:49,767 - __main__ - INFO - ╚══════════════════════════════════════╝
+2026-04-06 16:53:49,767 - __main__ - INFO - 1. CHARGEMENT & PRÉPARATION
+2026-04-06 16:53:49,852 - __main__ - INFO - =========== TRANFORMATION DES DONNÉES SUCCESSFUL=============
+2026-04-06 16:53:50,155 - __main__ - INFO - =========== DEFINITION DU AQI LABEL =============
+2026-04-06 16:53:50,157 - __main__ - INFO - Calcul statistiques des PM et AQI selon les normes OMS
+2026-04-06 16:56:14,905 - __main__ - INFO - ╔══════════════════════════════════════╗
+2026-04-06 16:56:14,906 - __main__ - INFO - ║  Dashboard on Quality Air — Cotonou  ║
+2026-04-06 16:56:14,906 - __main__ - INFO - ╚══════════════════════════════════════╝
+2026-04-06 16:56:14,906 - __main__ - INFO - 1. CHARGEMENT & PRÉPARATION
+2026-04-06 16:56:14,981 - __main__ - INFO - =========== TRANFORMATION DES DONNÉES SUCCESSFUL=============
+2026-04-06 16:56:15,263 - __main__ - INFO - =========== DEFINITION DU AQI LABEL =============
+2026-04-06 16:56:15,265 - __main__ - INFO - Calcul statistiques des PM et AQI selon les normes OMS
+2026-04-06 16:57:00,350 - __main__ - INFO - ╔══════════════════════════════════════╗
+2026-04-06 16:57:00,350 - __main__ - INFO - ║  Dashboard on Quality Air — Cotonou  ║
+2026-04-06 16:57:00,350 - __main__ - INFO - ╚══════════════════════════════════════╝
+2026-04-06 16:57:00,350 - __main__ - INFO - 1. CHARGEMENT & PRÉPARATION
+2026-04-06 16:57:00,435 - __main__ - INFO - =========== TRANFORMATION DES DONNÉES SUCCESSFUL=============
+2026-04-06 16:57:00,708 - __main__ - INFO - =========== DEFINITION DU AQI LABEL =============
+2026-04-06 16:57:00,710 - __main__ - INFO - Calcul statistiques des PM et AQI selon les normes OMS
+2026-04-06 16:57:01,338 - dash.dash - INFO - Dash is running on http://127.0.0.1:8081/
+
+2026-04-06 16:57:04,440 - __main__ - INFO - ╔══════════════════════════════════════╗
+2026-04-06 16:57:04,440 - __main__ - INFO - ║  Dashboard on Quality Air — Cotonou  ║
+2026-04-06 16:57:04,440 - __main__ - INFO - ╚══════════════════════════════════════╝
+2026-04-06 16:57:04,440 - __main__ - INFO - 1. CHARGEMENT & PRÉPARATION
+2026-04-06 16:57:04,520 - __main__ - INFO - =========== TRANFORMATION DES DONNÉES SUCCESSFUL=============
+2026-04-06 16:57:04,809 - __main__ - INFO - =========== DEFINITION DU AQI LABEL =============
+2026-04-06 16:57:04,811 - __main__ - INFO - Calcul statistiques des PM et AQI selon les normes OMS
+2026-04-07 11:23:06,298 - __main__ - INFO - ╔══════════════════════════════════════╗
+2026-04-07 11:23:06,299 - __main__ - INFO - ║  Dashboard on Quality Air — Cotonou  ║
+2026-04-07 11:23:06,299 - __main__ - INFO - ╚══════════════════════════════════════╝
+2026-04-07 11:23:06,299 - __main__ - INFO - 1. CHARGEMENT & PRÉPARATION
+2026-04-07 11:23:06,436 - __main__ - INFO - =========== TRANFORMATION DES DONNÉES SUCCESSFUL=============
+2026-04-07 11:23:06,442 - __main__ - WARNING - L'API n'est pas encore lancée.
+2026-04-07 11:55:41,812 - __main__ - INFO - ╔══════════════════════════════════════╗
+2026-04-07 11:55:41,812 - __main__ - INFO - ║  Collecteur Qualité d'Air — Cotonou  ║
+2026-04-07 11:55:41,812 - __main__ - INFO - ╚══════════════════════════════════════╝
+2026-04-07 11:55:41,813 - __main__ - INFO - ✓ Base de données prête
+2026-04-07 11:55:41,814 - __main__ - INFO - Dernière date en base : 2026-04-06 → collecte depuis 2026-04-07
+2026-04-07 11:55:41,814 - __main__ - INFO - === Collecte 2026-04-07 → 2026-04-07 ===
+2026-04-07 11:55:43,693 - __main__ - INFO - Données reçues : 24 lignes (2026-04-07 → 2026-04-07)
+2026-04-07 11:55:43,712 - __main__ - INFO - ✓ Insertion BD : 24 lignes (doublons ignorés)
+2026-04-07 11:55:43,841 - __main__ - INFO - ✓ Export CSV : data/raw/hourly_quality_air_data.csv
+2026-04-07 11:55:43,841 - __main__ - INFO - === Collecte terminée ===
+2026-04-07 11:55:43,846 - apscheduler.scheduler - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2026-04-07 11:55:43,846 - apscheduler.scheduler - INFO - Added job "collect_and_refresh" to job store "default"
+2026-04-07 11:55:43,846 - apscheduler.scheduler - INFO - Scheduler started
+2026-04-07 11:55:43,846 - __main__ - INFO - Scheduler démarré — prochaine collecte : 2026-04-07 11:15:43.841552+00:00
+2026-04-07 12:15:43,842 - apscheduler.executors.default - INFO - Running job "collect_and_refresh (trigger: interval[0:20:00], next run at: 2026-04-07 11:15:43 UTC)" (scheduled at 2026-04-07 11:15:43.841552+00:00)
+2026-04-07 12:15:43,844 - __main__ - INFO - Dernière date en base : 2026-04-07 → collecte depuis 2026-04-08
+2026-04-07 12:15:43,844 - __main__ - INFO - Données déjà à jour (start=2026-04-08 > end=2026-04-07) — rien à faire
+2026-04-07 12:15:43,844 - apscheduler.executors.default - INFO - Job "collect_and_refresh (trigger: interval[0:20:00], next run at: 2026-04-07 11:35:43 UTC)" executed successfully
+2026-04-07 12:35:43,842 - apscheduler.executors.default - INFO - Running job "collect_and_refresh (trigger: interval[0:20:00], next run at: 2026-04-07 11:55:43 UTC)" (scheduled at 2026-04-07 11:35:43.841552+00:00)
+2026-04-07 12:35:43,844 - __main__ - INFO - Dernière date en base : 2026-04-07 → collecte depuis 2026-04-08
+2026-04-07 12:35:43,844 - __main__ - INFO - Données déjà à jour (start=2026-04-08 > end=2026-04-07) — rien à faire
+2026-04-07 12:35:43,844 - apscheduler.executors.default - INFO - Job "collect_and_refresh (trigger: interval[0:20:00], next run at: 2026-04-07 11:55:43 UTC)" executed successfully
+2026-04-07 12:55:43,853 - apscheduler.executors.default - INFO - Running job "collect_and_refresh (trigger: interval[0:20:00], next run at: 2026-04-07 12:15:43 UTC)" (scheduled at 2026-04-07 11:55:43.841552+00:00)
+2026-04-07 12:55:43,861 - __main__ - INFO - Dernière date en base : 2026-04-07 → collecte depuis 2026-04-08
+2026-04-07 12:55:43,862 - __main__ - INFO - Données déjà à jour (start=2026-04-08 > end=2026-04-07) — rien à faire
+2026-04-07 12:55:43,862 - apscheduler.executors.default - INFO - Job "collect_and_refresh (trigger: interval[0:20:00], next run at: 2026-04-07 12:15:43 UTC)" executed successfully
+2026-04-07 13:11:07,705 - __main__ - INFO - Arrêt demandé — shutdown propre
+2026-04-07 13:11:07,719 - apscheduler.scheduler - INFO - Scheduler has been shut down
+2026-04-07 16:49:02,258 - __main__ - INFO - ╔══════════════════════════════════════╗
+2026-04-07 16:49:02,260 - __main__ - INFO - ║  Collecteur Qualité d'Air — Cotonou  ║
+2026-04-07 16:49:02,261 - __main__ - INFO - ╚══════════════════════════════════════╝
+2026-04-07 16:49:02,263 - __main__ - INFO - ✓ Base de données prête
+2026-04-07 16:49:02,264 - __main__ - INFO - Dernière date en base : 2026-04-07 → collecte depuis 2026-04-08
+2026-04-07 16:49:02,264 - __main__ - INFO - Données déjà à jour (start=2026-04-08 > end=2026-04-07) — rien à faire
+2026-04-07 16:49:02,266 - apscheduler.scheduler - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2026-04-07 16:49:02,266 - apscheduler.scheduler - INFO - Added job "collect_and_refresh" to job store "default"
+2026-04-07 16:49:02,266 - apscheduler.scheduler - INFO - Scheduler started
+2026-04-07 16:49:02,267 - __main__ - INFO - Scheduler démarré — prochaine collecte : 2026-04-07 16:09:02.264663+00:00
+2026-04-07 16:49:25,714 - __main__ - INFO - Arrêt demandé — shutdown propre
+2026-04-07 16:49:25,725 - apscheduler.scheduler - INFO - Scheduler has been shut down
