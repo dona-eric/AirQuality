@@ -1,8 +1,19 @@
+from flask import logging
 import pandas as pd
 import numpy as np
 import joblib # Pour sauvegarder/charger le modèle
-from xgboost import XGBRegressor
+import mlflow # Pour la gestion des expériences et du modèle
+import os
+import logging
 
+
+LOG_PATH = "logs/api.log"
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    handlers=[logging.FileHandler(LOG_PATH), logging.StreamHandler()],
+)
+logger = logging.getLogger(__name__)
 def logger_info(message):
     print(f"[INFO] {message}")
 
