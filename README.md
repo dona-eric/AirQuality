@@ -1,15 +1,15 @@
-## Projet 2 — Météo & Environnement
+## Projet 2 — Air Quality & Pollution d'air 
 
-Objectif ML : prédire la consommation d'énergie d'une ville en fonction des conditions météo (régression).
-
-
+Objectif ML : Prévoir l'indice de la qualité d'air(AQI) dans la ville de Cotonou (Littoral).
 
 
 
 
 
 
-![alt text](images/image.png)
+
+
+![alt text](images/quality_air.png)
 
 
 
