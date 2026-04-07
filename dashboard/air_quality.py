@@ -195,13 +195,19 @@ peaks = (df[df["european_aqi"] > 60].groupby("date_str")["european_aqi"].max().s
 # 2. PALETTE & STYLES
 
 C = {
-    "coral":  "#F0CF4C", "blue":   "#4463DB",
-    "teal":   "#1E7E73", "amber":  "#62D47B",
-    "purple": "#7F6B95", "gray":   "#7A80A7",
-    "green":  "#5DB4A8", "red":    "#D83535",
-    "bg":     "#EAF2ECD6", "card":   "#FCFFFEF8",
-    "border": "#7F90C2", "text":   "#2C3E50",
-    "text2":  "#060606", "accent": "#FF6B6B",
+    "primary":  "#0F172A", # Bleu ardoise foncé pour le texte principal
+    "secondary": "#64748B", # Gris bleuté pour le texte secondaire
+    "accent":   "#3B82F6", # Bleu moderne pour les interactions
+    "bg":       "#F8FAFC", # Fond gris très clair (standard UI moderne)
+    "card":     "#FFFFFF", # Blanc pur pour les cartes
+    "border":   "#E2E8F0", # Bordures très fines et claires
+    "success":  "#10B981",
+    "warning":  "#F59E0B",
+    "danger":   "#EF4444",
+    "coral":    "#FB923C",
+    "teal":     "#0D9488",
+    "amber": "#35AD1A",
+    "blue": "#1A52AD",
 }
 
 if AQI <= 50:
@@ -212,28 +218,27 @@ elif AQI <= 100:
     aqi_color = C["amber"]
 else:
     aqi_label = "Mauvais"
-    aqi_color = C["red"]
+    aqi_color = C["danger"]
 
 POLLUANT_META = {
     "pm2_5":           ("PM2.5 (μg/m³)",        C["coral"],  0,  55),
-    "pm10":            ("PM10 (μg/m³)",         C["amber"],  0, 150),
-    "carbon_dioxide":    ("CO2 (μg/m³)",        C["purple"], 0, 100),
+    "pm10":            ("PM10 (μg/m³)",         C["teal"],  0, 150),
+    "carbon_dioxide":    ("CO2 (μg/m³)",        C["card"], 0, 100),
     "carbon_monoxide": ("CO (μg/m³)",           C["blue"],   0, 400),
     "ozone":           ("Ozone O₃ (μg/m³)",     C["teal"],   0, 180),
-    "nitrogen_dioxide":("NO₂ (μg/m³)",          C["gray"],   0,  15),
+    "nitrogen_dioxide":("NO₂ (μg/m³)",          C["secondary"],   0,  15),
     "sulphur_dioxide": ("SO₂ (μg/m³)",          C["amber"],  0,   5),
-    "methane":         ("Méthane (μg/m³)",      C["blue"],   0,2000),
+    "methane":         ("Méthane (μg/m³)",      C["accent"],   0,2000),
 }
 
 TEMPLATE = "plotly_white"
 CARD_STYLE = {
     "background": C["card"],
     "border": f"1px solid {C['border']}",
-    "borderRadius": "16px",
-    "padding": "24px",
+    "borderRadius": "12px",
+    "padding": "20px",
     "marginBottom": "20px",
-    "boxShadow": "0 4px 12px rgba(0,0,0,0.08)",
-    "transition": "all 0.3s ease",
+    "boxShadow": "0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)",
 }
 
 # =====================3. FIGURES=========================
@@ -288,8 +293,8 @@ def fig_hourly_pollutants() -> go.Figure:
         (1, 1, "pm2_5",        C["coral"]),
         (1, 2, "pm10",         C["amber"]),
         (1, 3, "ozone",        C["teal"]),
-        (2, 1, "sulphur_dioxide", C["purple"]),
-        (2, 2, "carbon_dioxide", C['green']),
+        (2, 1, "sulphur_dioxide", C["secondary"]),
+        (2, 2, "carbon_dioxide", C['accent']),
         (2, 3, "nitrogen_dioxide", C["blue"])
 
     ]:
@@ -320,7 +325,7 @@ def fig_monthly_evolution() -> go.Figure:
     for col, color, label in [
         ("pm2_5",        C["coral"],  "PM2.5"),
         ("pm10",         C["amber"],  "PM10"),
-        ("sulphur_dioxide", C["purple"], "SO2"),
+        ("sulphur_dioxide", C["card"], "SO2"),
         ("nitrogen_dioxide",C['accent'], "NO2"),
         ("carbon_dioxide", C['blue'], "CO2"),
         ("ozone",        C["teal"],   "O₃"),
@@ -367,7 +372,7 @@ def fig_pm_scatter() -> go.Figure:
         x=sample["pm10"],
         y=sample["pm2_5"],
         mode="markers",
-        marker=dict(size=3, opacity=0.3, color=C["gray"]),
+        marker=dict(size=3, opacity=0.3, color=C["amber"]),
         showlegend=False
     ))
 
@@ -381,7 +386,7 @@ def fig_pm_scatter() -> go.Figure:
     fig.add_trace(go.Scatter(
         x=x_range, y=p(x_range),
         mode="lines",
-        line=dict(color=C["red"], dash="dash", width=2),
+        line=dict(color=C["danger"], dash="dash", width=2),
         name=f"Régression (y={z[0]:.2f}x+{z[1]:.2f})",
         hoverinfo="skip",
     ))
@@ -439,7 +444,7 @@ def fig_correlation_heatmap() -> go.Figure:
         z=z, x=labels, y=labels,
         text=text, texttemplate="%{text}",
         textfont=dict(size=11),
-        colorscale=[[0, 'blue'], [0.5, 'green'], [1.0, 'rgb(0, 0, 255)'],
+        colorscale=[[0, 'blue'], [0.5, 'red'], [1.0, 'rgb(0, 0, 255)'],
         ],
         zmid=0, zmin=-1, zmax=1,
         colorbar=dict(title="correlation", thickness=12, len=0.8),
@@ -489,7 +494,7 @@ def fig_peaks_bar() -> go.Figure:
         y=peaks["european_aqi"],
         marker=dict(
             color=peaks["european_aqi"],
-            colorscale=[[0, C["amber"]], [0.5, C["coral"]], [1.0, C["red"]]],
+            colorscale=[[0, C["amber"]], [0.5, C["coral"]], [1.0, C["danger"]]],
             colorbar=dict(title="AQI", thickness=10),
         ),
         text=peaks["european_aqi"].round(1),
@@ -498,7 +503,7 @@ def fig_peaks_bar() -> go.Figure:
     ))
 
     # Seuil "Très mauvais"
-    fig.add_hline(y=60, line=dict(color=C["red"], dash="dash", width=1.5),
+    fig.add_hline(y=60, line=dict(color=C["danger"], dash="dash", width=1.5),
                   annotation_text="Seuil 'Très mauvais' (60)",
                   annotation_font_size=10)
 
@@ -533,7 +538,7 @@ def fig_monthly_boxplot() -> go.Figure:
 #================================== DISTRIBUTION INTERACTIVE======================
 def fig_distribution_interactive(variable: str = "pm2_5") -> go.Figure:
     """Histogramme + box plot en subplot pour une variable."""
-    meta = POLLUANT_META.get(variable, (variable, C["gray"], 0, 200))
+    meta = POLLUANT_META.get(variable, (variable, C["border"], 0, 200))
     label, color, _, _ = meta
     vals = df[variable].dropna()
 
@@ -678,7 +683,7 @@ def fig_episodes_pollution() -> go.Figure:
             orientation="h",
             marker=dict(
                 color=row["aqi_max"],
-                colorscale=[[0, C["amber"]], [0.5, C["coral"]], [1.0, C["red"]]],
+                colorscale=[[0, C["amber"]], [0.5, C["coral"]], [1.0, C["danger"]]],
                 cmin=60, cmax=82,
             ),
             text=f"  {row['duree']}h · AQI max {row['aqi_max']}",
@@ -731,9 +736,9 @@ def fig_timeseries_anomalies(polluant: str = "pm2_5") -> go.Figure:
         ]:
             fig.add_hrect(y0=lo, y1=hi, fillcolor=lcolor, line_width=0,
                           annotation_text=lbl, annotation_position="left",
-                          annotation_font_size=10, annotation_font_color=C["text2"])
+                          annotation_font_size=10, annotation_font_color=C["border"])
         # Seuil OMS
-        fig.add_hline(y=15, line=dict(color=C["red"], dash="dash", width=1),
+        fig.add_hline(y=15, line=dict(color=C["danger"], dash="dash", width=1),
                       annotation_text="Seuil OMS 24h (15)", annotation_font_size=10)
  
     # Série principale
@@ -758,7 +763,7 @@ def fig_timeseries_anomalies(polluant: str = "pm2_5") -> go.Figure:
         fig.add_trace(go.Scatter(
             x=anom_days["date_str"], y=anom_days[polluant],
             mode="markers", name="Anomalie détectée",
-            marker=dict(color=C["red"], size=9, symbol="x",
+            marker=dict(color=C["danger"], size=9, symbol="x",
                         line=dict(color="white", width=1.5)),
             hovertemplate="⚠ Anomalie<br>%{x}<br><b>%{y:.1f}</b><extra></extra>",
         ))
@@ -793,11 +798,11 @@ def fig_oms_gauges() -> go.Figure:
  
     for i, (label, val, seuil, color) in enumerate(polluants, 1):
         pct     = val / seuil
-        g_color = C["red"] if pct > 1 else (C["amber"] if pct > 0.75 else C["teal"])
+        g_color = C["danger"] if pct > 1 else (C["amber"] if pct > 0.75 else C["teal"])
         fig.add_trace(go.Indicator(
             mode="gauge+number+delta",
             value=val,
-            delta={"reference": seuil, "increasing": {"color": C["red"]},
+            delta={"reference": seuil, "increasing": {"color": C["danger"]},
                    "decreasing": {"color": C["teal"]}, "suffix": " μg/m³"},
             number={"suffix": " μg/m³", "font": {"size": 18}},
             gauge={
@@ -808,15 +813,15 @@ def fig_oms_gauges() -> go.Figure:
                 "steps": [
                     {"range": [0, seuil * 0.75],  "color": C["teal"]},
                     {"range": [seuil * 0.75, seuil],"color": C["amber"]},
-                    {"range": [seuil, seuil * 2.5],"color": C["red"]},
+                    {"range": [seuil, seuil * 2.5],"color": C["danger"]},
                 ],
                 "threshold": {
-                    "line":  {"color": C["red"], "width": 3},
+                    "line":  {"color": C["danger"], "width": 3},
                     "thickness": 0.85,
                     "value": seuil,
                 },
             },
-            title={"text": f"Seuil OMS : {seuil} μg/m³", "font": {"size": 11, "color": C["text2"]}},
+            title={"text": f"Seuil OMS : {seuil} μg/m³", "font": {"size": 11, "color": C["border"]}},
         ), row=1, col=i)
  
     fig.update_layout(
@@ -829,22 +834,47 @@ def fig_oms_gauges() -> go.Figure:
 
 def kpi_card(label, value, sub=None, color=None):
     return html.Div([
-        html.Div(label, style={"fontSize":"12px","color":C["text2"],"marginBottom":"8px","fontWeight":"600","letterSpacing":"0.5px","textTransform":"uppercase"}),
-        html.Div(value, style={"fontSize":"28px","fontWeight":"700",
-                               "color": color or C["text"], "lineHeight":"1","marginBottom":"8px"}),
-        html.Div(sub or "", style={"fontSize":"11px","color":C["text2"],"marginTop":"0px","fontWeight":"400"}),
-    ], style={"background":C["card"],"border":f"3px solid {color or C['text2']}","borderRadius":"14px","padding":"18px 16px","flex":"1","boxShadow":"0 2px 8px rgba(0,0,0,0.06)","borderLeft":f"4px solid {color or C['text2']}"})
+        html.Div(label, style={
+            "fontSize": "11px", 
+            "color": C["secondary"], 
+            "fontWeight": "700", 
+            "textTransform": "uppercase", 
+            "letterSpacing": "0.05em",
+            "marginBottom": "4px"
+        }),
+        html.Div(value, style={
+            "fontSize": "24px", 
+            "fontWeight": "800", 
+            "color": color if color else C["primary"],
+            "marginBottom": "4px"
+        }),
+        html.Div(sub or "", style={
+            "fontSize": "11px", 
+            "color": C["secondary"],
+            "fontWeight": "400"
+        }),
+    ], style={
+        "background": C["card"],
+        "borderLeft": f"4px solid {color if color else C['accent']}",
+        "borderRadius": "8px",
+        "padding": "16px",
+        "flex": "1",
+        "minWidth": "180px",
+        "boxShadow": "0 1px 2px rgba(0,0,0,0.05)",
+        "border": f"1px solid {C['border']}"
+    })
 
 def section(title):
     return html.Div([
-        html.Span("▸", style={"color":C["accent"],"marginRight":"8px","fontSize":"14px"}),
-        html.Span(title, style={"fontWeight":"700","color":C["text"]}),
-    ], style={
-        "fontSize":"15px","fontWeight":"700","color":C["text"],
-        "letterSpacing":"1.5px","marginBottom":"16px","marginTop":"28px",
-        "display":"flex","alignItems":"center","paddingBottom":"12px",
-        "borderBottom":f"2px solid {C['border']}",
-    })
+        html.H3(title, style={
+            "fontSize": "16px",
+            "fontWeight": "700",
+            "color": C["primary"],
+            "margin": "30px 0 15px 0",
+            "display": "flex",
+            "alignItems": "center"
+        }),
+    ])
 
 app = dash.Dash(__name__, 
                 title="Indice de la Qualité d'Air à Cotonou",
@@ -853,35 +883,43 @@ app = dash.Dash(__name__,
 
 
 app.layout = html.Div(
-    style={"font-family": " 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Ubuntu Condensed",
-           "background":C["bg"],"minHeight":"100vh",
-           "padding":"24px","color":C["text"]},
+    style={
+        "fontFamily": "'Inter', 'Segoe UI', sans-serif", # Police plus standard pro
+        "background": C["bg"], 
+        "minHeight": "100vh",
+        "padding": "40px 10%", # Plus d'espace sur les côtés pour la lisibilité
+        "color": C["primary"]
+    },
     children=[
 
         # En-tête
-        html.H1("Qualité de l'Air · Pollution d'Air · Littoral-Cotonou, Bénin",
-                style={"fontSize":"42px","fontWeight":"800","marginBottom":"12px","color":C["text"],"backgroundImage":f"linear-gradient(135deg, {C['coral']}, {C['purple']})","backgroundClip":"text","-webkit-backgroundClip":"text","-webkit-textFillColor":"transparent","letterSpacing":"-0.5px"}),
-        html.P("Niveau de pollution de l'air PM2.5, PM10 à Cotonou · Sept 2025 - Mar 2026",
-               style={"fontSize":"15px","color":C["text2"],"marginBottom":"28px","fontWeight":"500","letterSpacing":"0.3px"}),
+        html.Div([
+            html.H1("Analyse Qualité de l'Air", 
+                    style={"fontSize": "32px", "fontWeight": "800", "color": C["primary"], "marginBottom": "5px"}),
+            html.P("Cotonou, Bénin • Surveillance des particules fines PM2.5 & PM10", 
+                   style={"color": C["secondary"], "fontSize": "16px", "marginBottom": "30px"}),
+        ], style={"textAlign": "left"}),
 
         #  KPIs 
         html.Div([
-            kpi_card('AQI Prédite', f"{prevision}", f"PM2.5 Actuel ={pm2_5_actual}", C["purple"] ),
-            kpi_card("AQI",  f"{AQI}", aqi_label, aqi_color),
-            kpi_card("PM2.5 moyen",      f"{pm2_5_mean} μg/m³", f"P95 = {pm2_5_p95}", C["blue"]),
+            html.Div([
+            kpi_card('Prédiction AQI', f"{prevision}", f"Actuel: {pm2_5_actual}", C["accent"]),
+            kpi_card("Indice AQI", f"{AQI}", aqi_label, aqi_color),
+            kpi_card("PM2.5 Moyen", f"{pm2_5_mean} μg/m³", f"P95: {pm2_5_p95}", C["coral"]),
+            kpi_card("PM10 Moyen", f"{pm_10_mean} μg/m³", "Données 24h", C["warning"]),
+        ], style={"display": "flex", "gap": "20px", "flexWrap": "wrap", "marginBottom": "30px"}),
             kpi_card("Niveau dominant",  
                      "Mauvais" if mauvais_pct > 50 else ("Modéré" if moyen_pct > 50 else "Bon"),
-                     f"Mauvais {mauvais_pct}% · Modéré {moyen_pct}% · Bon {bon_pct}%", C["purple"]),
-            kpi_card("PM10 moyen",       f"{pm_10_mean} μg/m³", None, C["amber"]),
+                     f"Mauvais {mauvais_pct}% · Modéré {moyen_pct}% · Bon {bon_pct}%", C["card"]),
             kpi_card("Ozone moyen",      f"{O3_mean} μg/m³", None, C["teal"]),
-            kpi_card("Rapport PM2.5/PM10", f"{df['pm_ratio'].mean().round(2)}", "Source mixte biomasse/poussière", C["green"]),
-            kpi_card("Anomalies",       f"{n_anomalies} h",   "IsolationForest 5%",           C["red"]),
+            kpi_card("Rapport PM2.5/PM10", f"{df['pm_ratio'].mean().round(2)}", "Source mixte biomasse/poussière", C["accent"]),
+            kpi_card("Anomalies",       f"{n_anomalies} h",   "IsolationForest 5%",           C["danger"]),
         ], style={"display":"flex","gap":"14px","marginBottom":"28px","flexWrap":"wrap"}),
 
         section("DÉPASSEMENT DES SEUILS OMS"),
             html.Div([
                 html.P("Valeurs moyennes vs Seuils OMS: Rouge = Dépassement",
-                    style={"fontSize":"12px","fontWeight":"500","color":C["text2"],"marginBottom":"10px"}),
+                    style={"fontSize":"12px","fontWeight":"500","color":C["border"],"marginBottom":"10px"}),
                 dcc.Graph(figure=fig_oms_gauges(), config={"displayModeBar":False}),
             ], style=CARD_STYLE),
 
@@ -892,7 +930,7 @@ app.layout = html.Div(
                 html.Div([
                     html.P("📊 Répartition des niveaux AQI — de Sept 2025 · Mars 2026",
                            style={"fontSize":"14px","fontWeight":"600",
-                                  "color":C["text"],"marginBottom":"12px","letterSpacing":"0.3px"}),
+                                  "color":C["border"],"marginBottom":"12px","letterSpacing":"0.3px"}),
                     dcc.Graph(figure=fig_aqi_distribution(),
                               config={"displayModeBar":False}),
                 ], style={**CARD_STYLE,"flex":"1.2"}),
@@ -900,7 +938,7 @@ app.layout = html.Div(
                 html.Div([
                     html.P("📈 Évolution mensuelle — comparaison polluants",
                            style={"fontSize":"14px","fontWeight":"600",
-                                  "color":C["text"],"marginBottom":"12px","letterSpacing":"0.3px"}),
+                                  "color":C["border"],"marginBottom":"12px","letterSpacing":"0.3px"}),
                     dcc.Graph(figure=fig_monthly_evolution(),
                               config={"displayModeBar":False}),
                 ], style={**CARD_STYLE,"flex":"1"}),
@@ -913,7 +951,7 @@ app.layout = html.Div(
         html.Div([
             html.P("⏰ Profil horaire moyen des 6 indicateurs clés",
                    style={"fontSize":"14px","fontWeight":"600",
-                          "color":C["text"],"marginBottom":"12px","letterSpacing":"1.3px"}),
+                          "color":C["border"],"marginBottom":"12px","letterSpacing":"1.3px"}),
             dcc.Graph(figure=fig_hourly_pollutants(),
                       config={"displayModeBar":False}),
         ], style=CARD_STYLE),
@@ -934,7 +972,7 @@ app.layout = html.Div(
         section("ÉVOLUTION MULTI-POLLUANTS & ROLLING 24H EMPILÉ"),
             html.Div([
                 html.P("Contribution cumulée PM2.5 + PM10 + O₃: zone Harmattan surlignée",
-                    style={"fontSize":"12px","fontWeight":"500","color":C["text2"],"marginBottom":"10px"}
+                    style={"fontSize":"12px","fontWeight":"500","color":C["border"],"marginBottom":"10px"}
                     ),
                 dcc.Graph(figure=fig_streamgraph(), config={"displayModeBar":False}),
             ], style=CARD_STYLE),
@@ -945,7 +983,7 @@ app.layout = html.Div(
             html.Div([
                 html.P("Structure de la Pollution Journalière",
                         style={"fontSize":"14px","fontWeight":"600",
-                                "color":C["text"],"marginBottom":"12px"}),
+                                "color":C["border"],"marginBottom":"12px"}),
                 dcc.Graph(figure=fig_hour_day_heatmap(),
                         config={"displayModeBar":False}),
                     ], style={**CARD_STYLE,"flex":"1"}),
@@ -953,7 +991,7 @@ app.layout = html.Div(
             html.Div([
                 html.P("Distribution Mensuelle",
                     style={"fontSize":"14px","fontWeight":"600",
-                            "color":C["text"],"marginBottom":"12px"}),
+                            "color":C["border"],"marginBottom":"12px"}),
                 dcc.Graph(figure=fig_monthly_boxplot(),
                     config={"displayModeBar":False}),
                 ], style={**CARD_STYLE,"flex":"1"}),
@@ -976,7 +1014,7 @@ app.layout = html.Div(
 
             html.Div([
                 html.P("Analyse des relations entre PM2.5 et les autres polluants", 
-                       style={"fontSize": "13px", "color": C['text']}),
+                       style={"fontSize": "13px", "color": C['border']}),
                 dcc.Dropdown(
                     id="rel-variable",
                     # on retire PM2.5 pour éviter la comparaison d'une variable avec elle‑même
@@ -996,7 +1034,7 @@ app.layout = html.Div(
                 html.Div([
                     html.P("Rélation de densité et Régression entre PM2.5 vs PM10",
                            style={"fontSize":"12px","fontWeight":"500",
-                                  "color":C["text2"],"marginBottom":"8px"}),
+                                  "color":C["border"],"marginBottom":"8px"}),
                     dcc.Graph(figure=fig_pm_scatter(),
                               config={"displayModeBar":False}),
                 ], style={**CARD_STYLE,"flex":"1"}),
@@ -1004,7 +1042,7 @@ app.layout = html.Div(
                 html.Div([
                     html.P("Matrice de corrélation des polluants",
                            style={"fontSize":"12px","fontWeight":"500",
-                                  "color":C["text2"],"marginBottom":"8px"}),
+                                  "color":C["border"],"marginBottom":"8px"}),
                     dcc.Graph(figure=fig_correlation_heatmap(),
                               config={"displayModeBar":False}),
                 ], style={**CARD_STYLE,"flex":"1"}),
@@ -1017,7 +1055,7 @@ app.layout = html.Div(
         html.Div([
             html.P("AQI maximum journalier — 15 pires jours de la période",
                    style={"fontSize":"12px","fontWeight":"500",
-                          "color":C["text2"],"marginBottom":"8px"}),
+                          "color":C["border"],"marginBottom":"8px"}),
             dcc.Graph(figure=fig_peaks_bar(), config={"displayModeBar":False}),
         ], style=CARD_STYLE),
 
@@ -1032,14 +1070,14 @@ app.layout = html.Div(
                 ], style={"display":"flex","alignItems":"flex-start","marginBottom":"10px"})
                 for color, text in [
                     (C["coral"],  "PM2.5 / PM10 : corrélation 0.92 — très colinéaires. Créer le ratio PM2.5/PM10 (= 0.44 en moyenne) comme feature de source de pollution plutôt que garder les deux bruts."),
-                    (C["purple"], "AQI corrèle fortement avec PM2.5 (0.84) et PM10 (0.80) → ce sont les drivers principaux de l'indice à Cotonou. Le modèle doit absolument intégrer ces deux polluants."),
+                    (C["card"], "AQI corrèle fortement avec PM2.5 (0.84) et PM10 (0.80) → ce sont les drivers principaux de l'indice à Cotonou. Le modèle doit absolument intégrer ces deux polluants."),
                     (C["teal"],   "Ozone corrèle avec PM (0.57) et SO₂ (0.63) → pollution photochimique. L'ozone monte en journée (pic 13-14h), créer un lag O₃ de 6h pour capturer cet effet."),
                     (C["amber"],  "Tendance mensuelle claire : AQI moyen = 49 en Jan, 46 en Fév, 31 en Mar. La saison sèche (Harmattan) est nettement plus polluée. Variable 'month' essentielle."),
                     (C["blue"],   "Cycle journalier fort sur PM et AQI : pic nocturne 0h-6h (accumulation), creux en milieu de journée (dispersion thermique). Lags 1h, 6h, 24h sont critiques."),
-                    (C["red"],    "572 heures en zone 'Très mauvais' (AQI > 60), dont 38h 'Dangereux' (> 80) — principalement jan-fév. Ces pics correspondent à l'Harmattan du Sahara. Détecter comme anomalies avec IsolationForest."),
+                    (C["danger"],    "572 heures en zone 'Très mauvais' (AQI > 60), dont 38h 'Dangereux' (> 80) — principalement jan-fév. Ces pics correspondent à l'Harmattan du Sahara. Détecter comme anomalies avec IsolationForest."),
                 ]
             ]
-        ], style={**CARD_STYLE,"background":"#f0ede6","border":"none"}),
+        ], style={**CARD_STYLE,"background":"#7CB550","border":"none"}),
     ]
 )
 
