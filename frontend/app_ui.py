@@ -800,7 +800,7 @@ with st.sidebar:
     st.divider()
     with st.expander("Paramètres API"):
         api_url = st.text_input("URL", "http://127.0.0.1:8000")
-        if st.button("Rafraîchir les données", use_container_width=True, width="stretch"):
+        if st.button("Rafraîchir les données", width="stretch"):
             st.cache_data.clear()
             st.rerun()
 
@@ -892,7 +892,7 @@ if selected_page == "Vue d'ensemble":
                             annotation_text="Limite OMS")
             fig_h.update_layout(template=TEMPLATE, height=260,
                                  margin=dict(l=10, r=10, t=10, b=10))
-            st.plotly_chart(fig_h, use_container_width=True)
+            st.plotly_chart(fig_h, width="stretch")
     else:
         st.info("💡 API non disponible. Lancez `python main.py` pour activer les prévisions.")
 
@@ -921,8 +921,7 @@ if selected_page == "Vue d'ensemble":
 
     # Conteneur blanc pour le graphique
     with st.container():
-        st.plotly_chart(fig_oms_gauges(pm2_5_mean, pm_10_mean, O3_mean, no2_mean),
-                        use_container_width=True)
+        st.plotly_chart(fig_oms_gauges(pm2_5_mean, pm_10_mean, O3_mean, no2_mean), width="stretch")
 
 
     # --- AQI Distribution + Mensuel ---
@@ -931,18 +930,18 @@ if selected_page == "Vue d'ensemble":
     c1, c2 = st.columns(2, gap="large")
     with c1:
         st.markdown('<p style="font-weight: 600; color: #1E293B; font-size: 14px;">Répartition des niveaux AQI</p>', unsafe_allow_html=True)
-        st.plotly_chart(fig_aqi_distribution(df), use_container_width=True)
+        st.plotly_chart(fig_aqi_distribution(df), width="stretch")
 
     with c2:
         st.markdown('<p style="font-weight: 600; color: #1E293B; font-size: 14px;">Évolution mensuelle comparative</p>', unsafe_allow_html=True)
-        st.plotly_chart(fig_monthly_evolution(monthly), use_container_width=True)
+        st.plotly_chart(fig_monthly_evolution(monthly), width="stretch")
 
 
     # --- Profil horaire ---
     section_title("⏰ PROFIL HORAIRE MOYEN — CYCLE JOURNALIER")
     st.markdown('<p style="color: #94A3B8; font-size: 13px; margin-top: -15px;">Analyse cyclique des 6 indicateurs clés sur 24 heures</p>', unsafe_allow_html=True)
 
-    st.plotly_chart(fig_hourly_pollutants(hourly), use_container_width=True)
+    st.plotly_chart(fig_hourly_pollutants(hourly), width="stretch")
 
 
     # --- Stream graph ---
@@ -950,7 +949,7 @@ if selected_page == "Vue d'ensemble":
     st.markdown('<p style="color: #94A3B8; font-size: 13px; margin-top: -15px;">Contribution cumulée PM2.5 + PM10 + O₃ · Focus zone Harmattan</p>', unsafe_allow_html=True)
 
     with st.container():
-        st.plotly_chart(fig_streamgraph(df), use_container_width=True)
+        st.plotly_chart(fig_streamgraph(df), width="stretch")
 
     # --- SECTION CARTOGRAPHIE ---
     section_title("🌍 CARTOGRAPHIE TEMPS RÉEL")
@@ -969,7 +968,7 @@ if selected_page == "Vue d'ensemble":
     with col_map_2:
         # Conteneur blanc pour la carte
         st.markdown('<div class="kpi-card">', unsafe_allow_html=True)
-        st.plotly_chart(fig_map_cotonou(map_poll_choice), use_container_width=True)
+        st.plotly_chart(fig_map_cotonou(map_poll_choice), width="stretch")
         st.markdown('</div>', unsafe_allow_html=True)
 
 
@@ -985,17 +984,17 @@ elif selected_page == "Séries Temporelles":
         index=0,
     )
     st.plotly_chart(fig_timeseries_anomalies(daily, df, poll_choice),
-                    use_container_width=True, width="stretch")
+                    width="stretch")
 
 
     section_title(" ANALYSE TEMPORELLE AVANCÉE")
     c1, c2 = st.columns(2)
     with c1:
         st.caption("Cycle pollution : heure vs jour de la semaine")
-        st.plotly_chart(fig_hour_day_heatmap(df), use_container_width=True, width="stretch")
+        st.plotly_chart(fig_hour_day_heatmap(df), width="stretch", )
     with c2:
         st.caption("Distribution mensuelle PM2.5")
-        st.plotly_chart(fig_monthly_boxplot(df), use_container_width=True, width="stretch")
+        st.plotly_chart(fig_monthly_boxplot(df), width="stretch", )
 
 
 # ══════════════════════════════════════════
@@ -1013,7 +1012,7 @@ elif selected_page == "Distributions":
             key="dist_sel",
         )
         st.plotly_chart(fig_distribution_interactive(df, dist_poll),
-                        use_container_width=True, width="stretch")
+                        width="stretch")
     with c2:
         rel_poll = st.selectbox(
             "Relation PM2.5 vs",
@@ -1023,7 +1022,7 @@ elif selected_page == "Distributions":
             key="rel_sel",
         )
         st.plotly_chart(fig_polluants_relation(df, rel_poll),
-                        use_container_width=True, width="stretch")
+                        width="stretch")
 
 
 # ══════════════════════════════════════════
@@ -1034,10 +1033,10 @@ elif selected_page == "Matrice Corrélations":
     c1, c2 = st.columns(2)
     with c1:
         st.caption("Densité & Régression PM2.5 vs PM10")
-        st.plotly_chart(fig_pm_scatter(df), use_container_width=True, width="stretch")
+        st.plotly_chart(fig_pm_scatter(df), width="stretch")
     with c2:
         st.caption("Matrice de corrélation des polluants")
-        st.plotly_chart(fig_correlation_heatmap(corr_matrix), use_container_width=True, width="stretch")
+        st.plotly_chart(fig_correlation_heatmap(corr_matrix), width="stretch")
 
 
 # ══════════════════════════════════════════
@@ -1045,12 +1044,12 @@ elif selected_page == "Matrice Corrélations":
 # ══════════════════════════════════════════
 elif selected_page == "Pics & Evolutions":
     section_title("📅 ÉPISODES DE POLLUTION PROLONGÉS (AQI > 60 pendant ≥ 6h)")
-    st.plotly_chart(fig_episodes_pollution(df), use_container_width=True, width="stretch")
+    st.plotly_chart(fig_episodes_pollution(df), width="stretch")
 
     st.divider()
     section_title("🏆 TOP 15 JOURS LES PLUS POLLUÉS")
     st.caption("AQI maximum journalier — 15 pires jours de la période")
-    st.plotly_chart(fig_peaks_bar(peaks), use_container_width=True, width="stretch")
+    st.plotly_chart(fig_peaks_bar(peaks), width="stretch")
 
 
 # ══════════════════════════════════════════
@@ -1098,7 +1097,7 @@ elif selected_page == "Analyses ML":
             "—", "—", "—", "—",
         ],
     })
-    st.dataframe(resume, use_container_width=True, width="stretch", hide_index=True)
+    st.dataframe(resume, width="stretch", hide_index=True)
 
 #=============================
 # FOOTER
@@ -1108,7 +1107,7 @@ st.markdown('<div style="margin-top: 100px;"></div>', unsafe_allow_html=True)
 # Ligne 2 : Copyright et Sources
 
 with st.container():
-    col_left, col_right = st.columns([0.7, 0.3])
+    col_left, col_right = st.columns([1, 2])
     with col_left:
         st.markdown(f"""
                     <p style="margin-bottom: 8px;">
