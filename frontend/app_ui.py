@@ -7,7 +7,9 @@ Fusion : visualisations EDA + prévisions IA 24h
 """
 
 import logging
+import sqlite3
 import pathlib
+import sqlite3
 import warnings
 from streamlit_option_menu import option_menu
 import numpy as np
@@ -234,14 +236,36 @@ CARD_STYLE = {
 
 # 2.========================= CHARGEMENT DONNÉES (mis en cache) ===========================
 
+API_BASE="https://donerick-air-quality.hf.space"
 
-@st.cache_data(show_spinner="Chargement des données air…")
+@st.cache_data(show_spinner="Chargement des données air…", ttl=7200)
 
-def load_data():
-    CSV_PATH = pathlib.Path("data/raw/hourly_quality_air_data.csv")
-    df_raw = pd.read_csv(CSV_PATH)
-    df_raw["date"] = pd.to_datetime(df_raw["date"], utc=True)
-    df = df_raw.sort_values("date").reset_index(drop=True)
+
+def load_data(api_url: str = API_BASE):
+    """Charge les données depuis l'API, avec mise en cache Streamlit."""
+
+    try:
+        r = requests.get(f"{api_url.rstrip('/')}/data", timeout=10)
+        r.raise_for_status()
+        if r.status_code == 200:
+            df = pd.DataFrame(r.json()["records"])
+            df["date"] = pd.to_datetime(df["date"], utc=True)
+            df = df.sort_values("date").reset_index(drop=True)
+        else:
+            st.error("Erreur lors du chargement des données.")
+            st.stop()
+    except Exception as e:
+        st.warning(f"API inaccessible ({e}), lecture fichier local…")
+        # Fallback local pour le dev
+        ROOT_DIR = pathlib.Path(__file__).parent.parent
+        CSV_PATH = ROOT_DIR / "data" / "raw" / "hourly_quality_air_data.csv"
+        if not CSV_PATH.exists():
+            st.error("Aucune source de données disponible.")
+            st.stop()
+
+        df_raw = pd.read_csv(CSV_PATH)
+        df_raw["date"] = pd.to_datetime(df_raw["date"], utc=True)
+        df = df_raw.sort_values("date").reset_index(drop=True)
 
     df["hour"]      = df["date"].dt.hour
     df["month"]     = df["date"].dt.month
@@ -307,7 +331,7 @@ def compute_aggregates(df):
 # ==================================
 # 3. APPEL API PRÉDICTION
 # ==================================
-def fetch_prediction(api_url: str):
+def fetch_prediction(api_url: str=API_BASE):
     try:
         r = requests.post(f"{api_url}/predict", timeout=5)
         if r.status_code == 200:
@@ -317,7 +341,7 @@ def fetch_prediction(api_url: str):
     return None
 
 
-def fetch_history(api_url: str):
+def fetch_history(api_url: str=API_BASE):
     try:
         r = requests.get(f"{api_url}/history", timeout=5)
         if r.status_code == 200:
@@ -799,7 +823,7 @@ with st.sidebar:
 
     st.divider()
     with st.expander("Paramètres API"):
-        api_url = st.text_input("URL", "http://127.0.0.1:8000")
+        api_url = st.text_input("URL", "https://donerick-air-quality.hf.space")
         if st.button("Rafraîchir les données", width="stretch"):
             st.cache_data.clear()
             st.rerun()
