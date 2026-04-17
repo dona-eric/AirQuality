@@ -1,0 +1,6 @@
+# parametres pour le modèle
+model_params:
+  n_estimators: 500
+  learning_rate: 0.05
+  max_depth: 5
+  subsample: 0.8
