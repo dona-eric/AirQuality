@@ -1,0 +1,109 @@
+version: '3.8'
+
+services:
+  # Service API FastAPI
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: air-quality-api
+    ports:
+      - "7860:7860"
+    environment:
+      - PYTHONUNBUFFERED=1
+      - HF_TOKEN=${HF_TOKEN}
+      - DAGSHUB_TOKEN=${DAGSHUB_TOKEN}
+      - MLFLOW_TRACKING_URI=${MLFLOW_TRACKING_URI}
+    volumes:
+      - ./data:/air-quality-app/data
+      - ./models:/air-quality-app/models
+      - ./logs:/air-quality-app/logs
+    command: uvicorn src.api.main:app --host 0.0.0.0 --port 7860
+    networks:
+      - air-quality-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:7860/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Service Dashboard Streamlit
+  dashboard:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: air-quality-dashboard
+    ports:
+      - "8501:8501"
+    environment:
+      - PYTHONUNBUFFERED=1
+      - HF_TOKEN=${HF_TOKEN}
+      - DAGSHUB_TOKEN=${DAGSHUB_TOKEN}
+    volumes:
+      - ./data:/air-quality-app/data
+      - ./models:/air-quality-app/models
+      - ./dashboard:/air-quality-app/dashboard
+    command: streamlit run dashboard/air_quality.py --server.port=8501 --server.address=0.0.0.0
+    networks:
+      - air-quality-network
+    restart: unless-stopped
+    depends_on:
+      api:
+        condition: service_healthy
+
+  # Service Frontend Next.js (optionnel)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: air-quality-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://api:7860
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    command: npm run dev
+    networks:
+      - air-quality-network
+    restart: unless-stopped
+    depends_on:
+      - api
+
+  # Service MLflow (optionnel pour le tracking)
+  mlflow:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: air-quality-mlflow
+    ports:
+      - "5000:5000"
+    environment:
+      - PYTHONUNBUFFERED=1
+    volumes:
+      - ./mlruns:/air-quality-app/mlruns
+    command: mlflow server --backend-store-uri sqlite:///mlruns/mlflow.db --default-artifact-root /air-quality-app/mlruns/artifacts --host 0.0.0.0 --port 5000
+    networks:
+      - air-quality-network
+    restart: unless-stopped
+
+networks:
+  air-quality-network:
+    driver: bridge
+
+volumes:
+  data:
+    driver: local
+  models:
+    driver: local
+  logs:
+    driver: local
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    command: [ "redis-server", "--appendonly", "yes" ]
