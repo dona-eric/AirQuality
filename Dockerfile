@@ -12,9 +12,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
+# les permissions
+RUN mkdir -p /air-quality-app/data /air-quality-app/logs && chmod -R 777 /air-quality-app/data /air-quality-app/logs
+# fastapi port
 
-# dash port app
-EXPOSE 8051
-
-
-CMD [ "python3", "dashboard/air_quality" ]
+CMD [ "uvicorn", "src.api.main:app", "--host", "0.0.0.0", "--port", "7860" ]
