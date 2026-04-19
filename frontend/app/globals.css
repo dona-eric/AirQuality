@@ -1,0 +1,113 @@
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@300;400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg:       #080C14;
+  --surface:  #0E1420;
+  --surface2: #111826;
+  --border:   #1A2438;
+  --muted:    #8896B0;
+  --text:     #C8D4E8;
+  --teal:     #00E5B4;
+  --coral:    #FB923C;
+  --indigo:   #6366F1;
+  --violet:   #8B5CF6;
+  --amber:    #F59E0B;
+  --danger:   #EF4444;
+  --success:  #0D9488;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Outfit', sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+
+/* Force dark mode styles */
+.dark, .dark * {
+  background-color: var(--bg) !important;
+  color: var(--text) !important;
+}
+
+/* Dividers & borders — force sombre */
+.h-px, [class*="border"] {
+  border-color: var(--border) !important;
+}
+.bg-slate-50, .bg-slate-100, .bg-white, [class*="bg-slate-"], [class*="bg-gray-"] {
+  background-color: var(--surface) !important;
+}
+.text-slate-600, .text-slate-400, .text-slate-300, [class*="text-slate-"], [class*="text-gray-"] {
+  color: var(--text) !important;
+}
+
+/* Recharts et composants Tailwind */
+.dark .recharts-tooltip-wrapper .recharts-default-tooltip {
+  background: var(--surface2) !important;
+  border: 1px solid var(--border) !important;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: var(--surface); }
+::-webkit-scrollbar-thumb { background: var(--teal); border-radius: 2px; }
+
+/* Recharts overrides */
+.recharts-tooltip-wrapper .recharts-default-tooltip {
+  background: var(--surface2) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 8px !important;
+  color: var(--text) !important;
+  font-family: 'JetBrains Mono', monospace !important;
+  font-size: 12px !important;
+}
+.recharts-cartesian-axis-tick-value {
+  fill: var(--muted) !important;
+  font-size: 11px !important;
+  font-family: 'JetBrains Mono', monospace !important;
+}
+.recharts-cartesian-grid line {
+  stroke: var(--border) !important;
+}
+.recharts-legend-item-text {
+  color: var(--muted) !important;
+  font-size: 11px !important;
+}
+
+/* Animations */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.3; }
+}
+
+.fade-up { animation: fadeUp 0.45s ease both; }
+.fade-up-1 { animation-delay: 0.05s; }
+.fade-up-2 { animation-delay: 0.10s; }
+.fade-up-3 { animation-delay: 0.15s; }
+.fade-up-4 { animation-delay: 0.20s; }
+.fade-up-5 { animation-delay: 0.25s; }
+.fade-up-6 { animation-delay: 0.30s; }
+
+.live-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--teal);
+  animation: pulse-dot 1.8s ease-in-out infinite;
+}

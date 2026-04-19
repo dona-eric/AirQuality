@@ -1,0 +1,65 @@
+# dvc.yml — Pipeline de contrôle de version des données et modèles
+# Chaque stage ne se ré-exécute que si ses dépendances changent
+# Exécution complète: dvc repro
+# Réinitialiser: dvc repro --force
+
+stages:
+
+  extract:
+    cmd: python3 src/etl/meteo.py && python3 src/etl/quality_air.py
+    deps:
+      - src/etl/meteo.py
+      - src/etl/quality_air.py
+    outs:
+      - data/raw/hourly_meteo_data.csv
+      - data/raw/hourly_quality_air_data.csv
+    desc: "Extraction des données météorologiques et qualité d'air depuis les APIs Open-Meteo"
+
+  process:
+    cmd: python3 src/etl/process_data.py
+    deps:
+      - src/etl/process_data.py
+      - data/raw/hourly_meteo_data.csv
+      - data/raw/hourly_quality_air_data.csv
+    outs:
+      - data/processed/df.csv
+    desc: "Transformation et nettoyage des données brutes (feature engineering)"
+
+  train:
+    cmd: python3 src/models/train.py
+    deps:
+      - src/models/train.py
+      - data/processed/df.csv
+    params:
+      - params.yml:
+          - model_params
+    outs:
+      - models/xgb_model.json
+    metrics:
+      - models/metrics.json:
+          cache: false
+    plots:
+      - models/validation_plot.png:
+          template: linear
+          x: epoch
+          y: loss
+    desc: "Entraînement du modèle XGBoost pour la prédiction de PM2.5 et AQI"
+
+  api:
+    cmd: uvicorn src.api.main:app --host 0.0.0.0 --port 7860
+    deps:
+      - src/api/main.py
+      - src/api/schemas.py
+      - models/xgb_model.json
+    params:
+      - params.yml:
+          - model_params
+    desc: "Lancement de l'API FastAPI pour les prédictions en temps réel"
+
+  dashboard:
+    cmd: streamlit run dashboard/air_quality.py --server.port=8501
+    deps:
+      - dashboard/air_quality.py
+      - data/processed/df.csv
+      - models/xgb_model.json
+    desc: "Lancement du dashboard Streamlit pour la visualisation interactive"
