@@ -62,13 +62,13 @@ export default function Overview({ records, daily, hourly, pred, hist, loadingPr
 
       {/* ── KPIs */}
       <SectionTitle>📊 Indicateurs clés — période complète</SectionTitle>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 14, marginBottom: 14 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 14, marginBottom: 14, minWidth:0 }}>
         <KPICard title="AQI Moyen"     value={String(aqiMean)} subtitle={aqiStatus} color={aqiColor} delay={0}   />
         <KPICard title="PM2.5 Moyen"   value={`${pm25Mean} μg/m³`} subtitle={`P95 : ${pm25P95}`} color={COLORS.coral}  delay={50}  />
         <KPICard title="PM10 Moyen"    value={`${pm10Mean} μg/m³`} subtitle="Données 24h"  color={COLORS.amber}  delay={100} />
         <KPICard title="Rapport PM2.5/PM10" value={String(pmRatio)} subtitle="Source mixte biomasse/poussière" color={COLORS.violet} delay={150} />
       </div>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 14 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 14 , minWidth:0}}>
         <KPICard title="Ozone Moyen"    value={`${o3Mean} μg/m³`}   subtitle=""              color={COLORS.teal}   delay={200} />
         <KPICard title="Heures Mauvais" value={`${mauvaisPct}%`}    subtitle="AQI > 35.5"    color={COLORS.danger} delay={250} />
         <KPICard title="Niveau dominant"

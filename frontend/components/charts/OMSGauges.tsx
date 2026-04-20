@@ -62,7 +62,7 @@ interface Props {
 
 export default function OMSGauges({ pm25, pm10, o3, no2 }: Props) {
   return (
-    <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 16 }}>
+    <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 16 , minWidth:0}}>
       <Gauge label="PM2.5"   value={pm25} threshold={12}  />
       <Gauge label="PM10"    value={pm10} threshold={40}  />
       <Gauge label="Ozone O₃" value={o3}  threshold={100} />

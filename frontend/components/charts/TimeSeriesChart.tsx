@@ -27,7 +27,7 @@ export default function TimeSeriesChart({ daily, anomalyDates = new Set(), pollu
         <Tooltip
           contentStyle={{ background: "#111826", borderRadius: 8, fontSize: 11, fontFamily: "JetBrains Mono" }}
           labelStyle={{ color: COLORS.text }}
-          formatter={(value: number) => value.toFixed(2)}
+          formatter={(value: any) => value.toFixed(2)}
         />
         <Legend />
         <Line 

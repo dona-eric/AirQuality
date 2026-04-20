@@ -487,6 +487,7 @@ export default function PollutantGrid({ records, daily }: Props) {
           display:               "grid",
           gridTemplateColumns:   "repeat(auto-fit, minmax(168px, 1fr))",
           gap:                   16,
+          minWidth: 0
         }}
       >
         {POLLUTANTS.map((def, i) => (

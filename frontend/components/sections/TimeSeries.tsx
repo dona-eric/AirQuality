@@ -95,7 +95,7 @@ export default function TimeSeries({ records, daily }: Props) {
       <SectionTitle>📈 Série temporelle + anomalies détectées</SectionTitle>
 
       {/* Selector */}
-      <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 14 }}>
+      <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 14, minWidth:0}}>
         {pollKeys.map((k) => {
           const m = POLLUTANT_META[k];
           const active = poll === k;

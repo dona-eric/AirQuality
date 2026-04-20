@@ -61,8 +61,11 @@ export function aggregateDaily(records: AirRecord[]): DailyRow[] {
   byDate.forEach((group, date) => {
     const row: DailyRow = { date } as DailyRow;
     for (const col of POLL_COLS) {
-      const vals = group.map((r) => r[col] as number).filter((v) => v != null && !isNaN(v));
-      (row as Record<string, unknown>)[col] = vals.length
+      const vals = group
+        .map((r) => r[col])
+        .filter((v) => v != null && !isNaN(v));
+
+      row[col] = vals.length
         ? +(vals.reduce((a, b) => a + b, 0) / vals.length).toFixed(3)
         : 0;
     }

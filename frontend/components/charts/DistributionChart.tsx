@@ -55,7 +55,7 @@ export default function DistributionChart({ records, pollutant }: Props) {
             tickFormatter={(v) => v.toFixed(1)} interval="preserveStartEnd" />
           <YAxis tick={{ fontSize: 9, fill: COLORS.muted }} />
           <Tooltip
-            formatter={(v: number) => [v, "Fréquence"]}
+            formatter={(v: any) => [v, "Fréquence"]}
             labelFormatter={(l) => `≈ ${Number(l).toFixed(2)} ${meta?.unit}`}
             contentStyle={{ background: "#111826", border: `1px solid ${COLORS.border}`, borderRadius: 8, fontSize: 11, fontFamily: "JetBrains Mono" }}
           />

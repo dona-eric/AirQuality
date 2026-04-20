@@ -36,7 +36,7 @@ function ScatterByAQI({ records, xKey }: { records: AirRecord[]; xKey: string })
         <XAxis dataKey="x" name={meta?.label ?? xKey} type="number" tick={{ fontSize: 9, fill: COLORS.muted }} label={{ value: meta?.label ?? xKey, position: "insideBottom", offset: -4, fontSize: 10, fill: COLORS.muted }} />
         <YAxis dataKey="y" name="PM2.5" type="number" tick={{ fontSize: 9, fill: COLORS.muted }} label={{ value: "PM2.5", angle: -90, position: "insideLeft", fontSize: 10, fill: COLORS.muted }} />
         <Tooltip
-          formatter={(v: number, n: string) => [v.toFixed(2), n]}
+          formatter={(v: any, n: any) => [v.toFixed(2), n]}
           contentStyle={{ background: "#111826", border: `1px solid ${COLORS.border}`, borderRadius: 8, fontSize: 11, fontFamily: "JetBrains Mono" }}
         />
         {Object.entries(grouped).map(([lbl, pts]) => (

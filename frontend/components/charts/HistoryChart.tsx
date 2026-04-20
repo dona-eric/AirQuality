@@ -20,7 +20,7 @@ export default function HistoryChart({ dates, values }: Props) {
         <XAxis dataKey="date" tick={{ fontSize: 11, fill: COLORS.muted, fontFamily: "JetBrains Mono" }} />
         <YAxis tick={{ fontSize: 11, fill: COLORS.muted, fontFamily: "JetBrains Mono" }} width={38} />
         <Tooltip
-          formatter={(v: number) => [`${v.toFixed(2)} μg/m³`, "PM2.5"]}
+          formatter={(v: any) => [`${v.toFixed(2)} μg/m³`, "PM2.5"]}
           contentStyle={{ background: "#111826", border: `1px solid ${COLORS.border}`, borderRadius: 8, fontFamily: "JetBrains Mono" }}
           labelStyle={{ color: COLORS.muted }}
         />

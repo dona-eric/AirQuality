@@ -100,7 +100,7 @@ export default function Peaks({ daily }: Props) {
             <ReferenceLine y={60} stroke={COLORS.danger} strokeDasharray="4 4"
               label={{ value: "Seuil Très mauvais", fill: COLORS.danger, fontSize: 9, position: "insideTopRight" }} />
             <Tooltip
-              formatter={(v: number) => [`${v}`, "AQI max"]}
+              formatter={(v: any) => [`${v}`, "AQI max"]}
               contentStyle={{ background: "#111826", border: `1px solid ${COLORS.border}`, borderRadius: 8, fontSize: 11, fontFamily: "JetBrains Mono" }}
             />
             <Bar dataKey="aqi" radius={[4, 4, 0, 0]}>
