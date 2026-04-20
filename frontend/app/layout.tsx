@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://aqi-cotonou.vercel.app";
+const siteUrl ="https://aqi-cotonou.netlify.app";
 const siteTitle = "AQI Cotonou · Surveillance Qualité de l'Air";
 const siteDescription =
   "Surveillance en temps réel et prévisions IA des PM2.5 & PM10 à Cotonou, Bénin";

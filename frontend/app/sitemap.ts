@@ -1,7 +1,7 @@
 import { MetadataRoute } from 'next';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = 'https://aqi-cotonou.vercel.app';
+  const baseUrl = 'https://aqi-cotonou.netlify.app/';
   const now = new Date().toISOString().split('T')[0];
 
   return [

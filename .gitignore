@@ -150,7 +150,6 @@ mlruns/
 
 mlflow.db
 sqlite.db
-*.png
 images/
-*.md
+
 models/air_quality.pkl

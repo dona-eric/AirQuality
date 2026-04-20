@@ -7,6 +7,6 @@ export default function robots(): MetadataRoute.Robots {
       allow: '/',
       disallow: '/api/',
     },
-    sitemap: 'https://aqi-cotonou.vercel.app/sitemap.xml',
+    sitemap: 'https://aqi-cotonou.netlify.app//sitemap.xml',
   };
 }
