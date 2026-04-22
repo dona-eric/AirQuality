@@ -1,0 +1,22 @@
+schema: '2.0'
+stages:
+  extract:
+    cmd: python3 src/etl/meteo.py && python3 src/etl/quality_air.py
+    deps:
+    - path: src/etl/meteo.py
+      hash: md5
+      md5: b0480be4203cb6434e239a52a110238c
+      size: 4010
+    - path: src/etl/quality_air.py
+      hash: md5
+      md5: 050b7785c670a795a1504c8dfbfa6b2c
+      size: 9866
+    outs:
+    - path: data/raw/hourly_meteo_data.csv
+      hash: md5
+      md5: c1ea9d5ac7d2cb5c4d5a50ad518535f9
+      size: 447153
+    - path: data/raw/hourly_quality_air_data.csv
+      hash: md5
+      md5: 7142ef867cb9d045d1cbba6b725a1cdf
+      size: 747018
