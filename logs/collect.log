@@ -1662,3 +1662,22 @@
 2026-05-15 15:10:33,640 - apscheduler.scheduler - INFO - Added job "collect_and_refresh" to job store "default"
 2026-05-15 15:10:33,640 - apscheduler.scheduler - INFO - Scheduler started
 2026-05-15 15:10:33,641 - __main__ - INFO - Scheduler démarré — prochaine collecte : 2026-05-15 15:30:33.639365+00:00
+2026-05-15 15:42:50,670 - __main__ - INFO - ╔══════════════════════════════════════╗
+2026-05-15 15:42:50,672 - __main__ - INFO - ║  Collecteur Qualité d'Air — Cotonou  ║
+2026-05-15 15:42:50,672 - __main__ - INFO - ╚══════════════════════════════════════╝
+2026-05-15 15:42:50,674 - __main__ - INFO - ✓ Base de données prête
+2026-05-15 15:42:50,675 - __main__ - INFO - Dernière date en base : 2026-05-15 → collecte depuis 2026-05-16
+2026-05-15 15:42:50,676 - __main__ - INFO - Données déjà à jour (start=2026-05-16 > end=2026-05-15) — rien à faire
+2026-05-15 15:42:50,677 - apscheduler.scheduler - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2026-05-15 15:42:50,678 - apscheduler.scheduler - INFO - Added job "collect_and_refresh" to job store "default"
+2026-05-15 15:42:50,678 - apscheduler.scheduler - INFO - Scheduler started
+2026-05-15 15:42:50,679 - __main__ - INFO - Scheduler démarré — prochaine collecte : 2026-05-15 16:02:50.676287+00:00
+2026-05-15 15:43:32,402 - src.etl.quality_air - INFO - ✓ Export CSV : data/raw/hourly_quality_air_data.csv
+2026-05-15 15:43:32,531 - src.etl.quality_air - INFO - ✓ Export Parquet : data/air_quality.parquet
+2026-05-15 15:48:01,333 - httpx - INFO - HTTP Request: POST https://dagshub.com/login/oauth/middleman "HTTP/1.1 504 Gateway Time-out"
+2026-05-15 15:48:37,220 - src.api.utils - INFO - Données chargées depuis le fichier Parquet
+2026-05-15 15:49:17,423 - src.etl.quality_air - INFO - ✓ Export Parquet : data/air_quality.parquet
+2026-05-15 15:53:15,224 - src.api.utils - INFO - Données chargées depuis le fichier Parquet
+2026-05-15 15:53:15,270 - src.api.utils - INFO - Données chargées depuis le fichier Parquet
+2026-05-15 15:53:47,261 - src.api.utils - INFO - Données chargées depuis le fichier Parquet
+2026-05-15 15:53:47,298 - src.api.utils - INFO - Données chargées depuis le fichier Parquet
