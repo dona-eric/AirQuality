@@ -3,34 +3,22 @@ import pandas as pd
 import joblib
 import os
 import uvicorn
-from pydantic import BaseModel
 import pathlib
 from typing import List, Dict
+from src.api.utils import get_df_fast
+from src.api.schemas import PredictionResponse, HistoryResponse
 
 app = FastAPI(title="Cotonou Air Quality API", description="Prévision des PM2.5 à 24h")
 
 # Chemins structurés
 BASE_DIR = pathlib.Path(__file__).parent
 MODEL_PATH = pathlib.Path("models/air_quality.pkl")
-DATA_PATH = pathlib.Path("data/raw/hourly_quality_air_data.csv")
 
 # Chargement du modèle au démarrage
 if MODEL_PATH.exists():
     model = joblib.load(MODEL_PATH)
 else:
     model = None
-
-class PredictionResponse(BaseModel):
-    date_prevision: str
-    current_pm25: float
-    predicted_pm25: float
-    delta: float
-    aqi_label: str
-    conseil: str
-
-class HistoryResponse(BaseModel):
-    dates: List[str]
-    values: List[float]
 
 def get_aqi_info(value):
     if value <= 12: return "Bon", "L'air est pur. Idéal pour les activités extérieures."
@@ -50,9 +38,8 @@ def home():
 def get_history():
     """Renvoie les 7 derniers jours de mesures réelles."""
     try:
-        df = pd.read_csv(DATA_PATH, parse_dates=['date'])
-        df.set_index('date', inplace=True)
-        df_daily = df.resample('D').mean().tail(7)
+        df = get_df_fast()
+        df_daily = df.resample('D').mean(numeric_only=True).tail(7)
         
         return {
             "dates": [d.strftime('%Y-%m-%d') for d in df_daily.index],
@@ -67,11 +54,9 @@ def predict():
         raise HTTPException(status_code=500, detail="Modèle non trouvé. Vérifiez le dossier 'models/'.")
 
     try:
-        df = pd.read_csv(DATA_PATH, parse_dates=['date'])
-        df['date'] = pd.to_datetime(df['date'], utc=True)
-        df.set_index('date', inplace=True)
+        df = get_df_fast()
         
-        df_daily = df.resample('D').mean().interpolate()
+        df_daily = df.resample('D').mean(numeric_only=True).interpolate()
         recent = df_daily.tail(10).copy()
         
         # Feature Engineering (Identique à l'entraînement)

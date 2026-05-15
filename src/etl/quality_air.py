@@ -27,6 +27,7 @@ LATITUDE, LONGITUDE = 6.4969, 2.6289  # Cotonou, Bénin
 INTERVAL_MIN    =  20         # Fréquence de mise à jour (heures)
 BACKFILL_FROM = "2025-09-30"    # Date de début historique
 DB_PATH = pathlib.Path("data/air_quality.db")
+PARQUET_PATH = pathlib.Path("data/air_quality.parquet")
 CSV_PATH = pathlib.Path("data/raw/hourly_quality_air_data.csv")
 LOG_PATH = pathlib.Path("logs/collect.log")
 API_URL = "https://air-quality-api.open-meteo.com/v1/air-quality"
@@ -211,6 +212,28 @@ def export_csv() -> pathlib.Path:
     return CSV_PATH
 
 
+def export_parquet() -> pathlib.Path:
+    """Exporte toute la table SQLite vers Parquet.
+    Appelé automatiquement après chaque collecte.
+    """
+    conn = sqlite3.connect(str(DB_PATH))
+    df = pd.read_sql_query(
+        "SELECT * FROM hourly_air_quality ORDER BY date ASC",
+        conn,
+        parse_dates=["date"],
+    )
+    conn.close()
+
+    df.to_parquet(PARQUET_PATH, index=False)
+    logger.info(f"✓ Export Parquet : {PARQUET_PATH}")
+    return PARQUET_PATH
+
+
+def export_format():
+    export_csv()
+    export_parquet()
+
+
 # SCHEDULER
 
 def _next_start_date() -> datetime.date:
@@ -261,7 +284,7 @@ def collect_and_refresh() -> None:
  
     if df is not None:
         store_dataframe(df)
-        export_csv()
+        export_format()
         logger.info("=== Collecte terminée ===")
     else:
         logger.error("Collecte échouée — aucune donnée reçue de l'API")
