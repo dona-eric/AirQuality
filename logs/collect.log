@@ -1681,3 +1681,14 @@
 2026-05-15 15:53:15,270 - src.api.utils - INFO - Données chargées depuis le fichier Parquet
 2026-05-15 15:53:47,261 - src.api.utils - INFO - Données chargées depuis le fichier Parquet
 2026-05-15 15:53:47,298 - src.api.utils - INFO - Données chargées depuis le fichier Parquet
+2026-05-15 16:04:57,596 - src.api.utils - INFO - Données chargées depuis le fichier Parquet
+2026-05-15 16:04:57,619 - src.api.utils - INFO - Données chargées depuis le fichier Parquet
+2026-05-15 16:04:57,680 - __main__ - ERROR - Erreur calcul performance : "['european_aqi_pm2_5'] not in index"
+2026-05-15 16:06:01,419 - src.api.utils - INFO - Données chargées depuis le fichier Parquet
+2026-05-15 16:06:01,437 - src.api.utils - INFO - Données chargées depuis le fichier Parquet
+2026-05-15 16:08:10,835 - __main__ - INFO - Vérification du besoin de ré-entraînement...
+2026-05-15 16:08:10,880 - src.api.utils - INFO - Données chargées depuis le fichier Parquet
+2026-05-15 16:08:10,898 - src.api.utils - INFO - Données chargées depuis le fichier Parquet
+2026-05-15 16:08:10,981 - __main__ - INFO - Pas de ré-entraînement nécessaire pour le moment.
+2026-05-15 16:10:13,029 - src.api.utils - INFO - Données chargées depuis le fichier Parquet
+2026-05-15 16:10:13,048 - src.api.utils - INFO - Données chargées depuis le fichier Parquet

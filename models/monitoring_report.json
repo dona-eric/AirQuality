@@ -1,0 +1,37 @@
+{
+    "timestamp": "2026-05-15T16:10:13.136609+00:00",
+    "data_quality": {
+        "missing_values_pct": {
+            "id": 0.0,
+            "pm2_5": 0.0,
+            "pm10": 0.0,
+            "carbon_monoxide": 0.0,
+            "carbon_dioxide": 0.0,
+            "sulphur_dioxide": 0.0,
+            "ozone": 0.0,
+            "nitrogen_dioxide": 0.0,
+            "formaldehyde": 0.7719298245614035,
+            "methane": 0.0,
+            "european_aqi": 0.0,
+            "european_aqi_pm2_5": 0.0,
+            "created_at": 0.0
+        },
+        "total_rows": 5472,
+        "last_update": "2026-05-15T23:00:00+00:00",
+        "anomalies_detected": 0,
+        "pm25_range_violation": 0
+    },
+    "performance": {
+        "mae": 2.1850202069396065,
+        "rmse": 3.0615539033443775,
+        "n_samples": 7
+    },
+    "baseline_comparison": {
+        "mae_aqi": 0.9452616077259275,
+        "mae_pm25": 2.092728081217573,
+        "mse_aqi": 2.3403493441440997,
+        "mse_pm": 8.44863456398377
+    },
+    "needs_retraining": false,
+    "reasons": []
+}
