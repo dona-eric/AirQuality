@@ -83,8 +83,12 @@ def predict():
         recent['month'] = recent.index.month
         
         # Sélection de la ligne la plus récente pour la prédiction
-        X_input = recent.tail(1).drop(columns=['formaldehyde'], errors='ignore')
+        X_input = recent.tail(1).drop(columns=['formaldehyde', 'id'], errors='ignore')
         
+        # Vérification des features attendues par le modèle
+        if hasattr(model, 'feature_names_in_'):
+            X_input = X_input[model.feature_names_in_]
+
         # Vérification qu'il n'y a pas de NaN (important pour XGBoost)
         if X_input.isnull().values.any():
             raise ValueError("Données historiques insuffisantes pour générer les lags.")

@@ -1648,3 +1648,17 @@
 2026-04-07 16:49:02,267 - __main__ - INFO - Scheduler démarré — prochaine collecte : 2026-04-07 16:09:02.264663+00:00
 2026-04-07 16:49:25,714 - __main__ - INFO - Arrêt demandé — shutdown propre
 2026-04-07 16:49:25,725 - apscheduler.scheduler - INFO - Scheduler has been shut down
+2026-05-15 15:10:32,749 - __main__ - INFO - ╔══════════════════════════════════════╗
+2026-05-15 15:10:32,750 - __main__ - INFO - ║  Collecteur Qualité d'Air — Cotonou  ║
+2026-05-15 15:10:32,750 - __main__ - INFO - ╚══════════════════════════════════════╝
+2026-05-15 15:10:32,750 - __main__ - INFO - ✓ Base de données prête
+2026-05-15 15:10:32,750 - __main__ - INFO - Dernière date en base : 2026-04-07 → collecte depuis 2026-04-08
+2026-05-15 15:10:32,751 - __main__ - INFO - === Collecte 2026-04-08 → 2026-05-15 ===
+2026-05-15 15:10:33,427 - __main__ - INFO - Données reçues : 912 lignes (2026-04-08 → 2026-05-15)
+2026-05-15 15:10:33,445 - __main__ - INFO - ✓ Insertion BD : 912 lignes (doublons ignorés)
+2026-05-15 15:10:33,638 - __main__ - INFO - ✓ Export CSV : data/raw/hourly_quality_air_data.csv
+2026-05-15 15:10:33,639 - __main__ - INFO - === Collecte terminée ===
+2026-05-15 15:10:33,640 - apscheduler.scheduler - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2026-05-15 15:10:33,640 - apscheduler.scheduler - INFO - Added job "collect_and_refresh" to job store "default"
+2026-05-15 15:10:33,640 - apscheduler.scheduler - INFO - Scheduler started
+2026-05-15 15:10:33,641 - __main__ - INFO - Scheduler démarré — prochaine collecte : 2026-05-15 15:30:33.639365+00:00
