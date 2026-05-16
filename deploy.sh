@@ -13,7 +13,8 @@ echo "🚀 Démarrage du déploiement du système Air Quality Cotonou..."
 # pip install -r requirements.txt
 
 # 2. Lancement de l'API FastAPI en arrière-plan
-echo "Starting FastAPI server..."
+echo "Starting FastAPI server with Model Version: ${MODEL_VERSION:-v1}"
+export MODEL_VERSION=${MODEL_VERSION:-v1}
 nohup uvicorn src.api.main:app --host 0.0.0.0 --port 8000 > "$LOG_DIR/api.log" 2>&1 &
 API_PID=$!
 echo "✅ API lancée avec le PID: $API_PID"

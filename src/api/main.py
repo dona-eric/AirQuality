@@ -14,12 +14,21 @@ app = FastAPI(title="Cotonou Air Quality API", description="Prévision des PM2.5
 # Chemins structurés
 BASE_DIR = pathlib.Path(__file__).parent
 MODEL_PATH = pathlib.Path("models/air_quality.pkl")
+MODEL_VERSION = os.getenv("MODEL_VERSION", "v1")
 
 # Chargement du modèle au démarrage
-if MODEL_PATH.exists():
+model = None
+if MODEL_PATH.exists() and MODEL_VERSION == "v1":
     model = joblib.load(MODEL_PATH)
+    print(f"Modèle local v1 chargé depuis {MODEL_PATH}")
 else:
-    model = None
+    # Tentative de chargement depuis HuggingFace (pour v2 ou si local absent)
+    from src.api.utils import load_model_from_hf
+    model = load_model_from_hf(version=MODEL_VERSION)
+    if model:
+        print(f"Modèle {MODEL_VERSION} chargé depuis HuggingFace")
+    else:
+        print(f"Échec du chargement du modèle {MODEL_VERSION}")
 
 def get_aqi_info(value):
     if value <= 12: return "Bon", "L'air est pur. Idéal pour les activités extérieures."

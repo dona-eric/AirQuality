@@ -204,13 +204,20 @@ def train():
     logger.info(f"Alias 'champion' → version {model_version.version}")
     
     model.save_model("model.json")
-    upload_file(
-        path_or_fileobj="model.json",
-        path_in_repo="models/xgboost_model.json",
-        repo_id=REPO_ID,
-        repo_type="dataset",
-        token=TOKEN
-    )
-    logger.info("Modèle uploadé sur HuggingFace ✓")
+
+    # Upload as latest and as version v2
+    paths = ["models/xgboost_model.json", "models/v2/xgboost_model.json"]
+    for path in paths:
+        try:
+            upload_file(
+                path_or_fileobj="model.json",
+                path_in_repo=path,
+                repo_id=REPO_ID,
+                repo_type="dataset",
+                token=TOKEN
+            )
+            logger.info(f"Modèle uploadé sur HuggingFace à {path} ✓")
+        except Exception as e:
+            logger.error(f"Erreur lors de l'upload vers {path} : {e}")
 if __name__=="__main__":
     train()
