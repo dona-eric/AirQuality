@@ -60,11 +60,16 @@ def get_df_fast():
 
 #===================== CONFIGURATION et CHARGEMENT DU MODÈLE ============================
 
-def load_model_from_hf():
+def load_model_from_hf(version="v1"):
+    """
+    Télécharge le modèle depuis HuggingFace.
+    Versions supportées : 'v1', 'v2'
+    """
+    filename = "models/xgboost_model.json" if version == "v1" else f"models/{version}/xgboost_model.json"
     try:
         model_path = hf_hub_download(
             repo_id=REPO_ID,
-            filename="models/xgboost_model.json",
+            filename=filename,
             repo_type="dataset",
             token=TOKEN
         )
