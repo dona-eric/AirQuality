@@ -3,6 +3,7 @@ import pandas as pd
 import joblib
 import os
 import uvicorn
+import json
 import pathlib
 from typing import List, Dict
 from src.api.utils import get_df_fast
@@ -33,6 +34,18 @@ def home():
         "model_loaded": model is not None,
         "message": "API de prévision de la qualité de l'air à Cotonou"
     }
+
+@app.get("/monitoring")
+def get_monitoring():
+    """Renvoie le dernier rapport de monitoring."""
+    report_path = pathlib.Path("models/monitoring_report.json")
+    if not report_path.exists():
+        # Lancer le monitoring s'il n'existe pas
+        from src.models.monitoring import check_monitoring
+        return check_monitoring()
+
+    with open(report_path, "r") as f:
+        return json.load(f)
 
 @app.get("/history", response_model=HistoryResponse)
 def get_history():
