@@ -1,109 +1,80 @@
-version: '3.8'
+# Lancement : docker compose up --build
+#   API       → http://localhost:7860/docs
+#   Frontend  → http://localhost:8501   (Streamlit)
+#   Dashboard → http://localhost:8050   (Dash, EDA)
+#   MLflow    → http://localhost:5000   (profil optionnel : docker compose --profile mlflow up)
+
+x-app: &app
+  build:
+    context: .
+    dockerfile: Dockerfile
+  environment: &app-env
+    PYTHONUNBUFFERED: "1"
+    HF_TOKEN: ${HF_TOKEN:-}
+  volumes:
+    - ./data:/air-quality-app/data
+    - ./models:/air-quality-app/models
+    - ./logs:/air-quality-app/logs
+  networks:
+    - air-quality-network
+  restart: unless-stopped
 
 services:
-  # Service API FastAPI
   api:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    <<: *app
     container_name: air-quality-api
     ports:
-      - "7860:7860"
+      - "${API_PORT:-7860}:7860"
     environment:
-      - PYTHONUNBUFFERED=1
-      - HF_TOKEN=${HF_TOKEN}
-      - DAGSHUB_TOKEN=${DAGSHUB_TOKEN}
-      - MLFLOW_TRACKING_URI=${MLFLOW_TRACKING_URI}
-    volumes:
-      - ./data:/air-quality-app/data
-      - ./models:/air-quality-app/models
-      - ./logs:/air-quality-app/logs
+      <<: *app-env
+      ENABLE_ETL_SCHEDULER: ${ENABLE_ETL_SCHEDULER:-1}
+      MODEL_VERSION: ${MODEL_VERSION:-latest}
     command: uvicorn src.api.main:app --host 0.0.0.0 --port 7860
-    networks:
-      - air-quality-network
-    restart: unless-stopped
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:7860/health"]
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:7860/health', timeout=5)"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 40s
 
-  # Service Dashboard Streamlit
-  dashboard:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: air-quality-dashboard
+  frontend:
+    <<: *app
+    container_name: air-quality-frontend
     ports:
-      - "8501:8501"
+      - "${UI_PORT:-8501}:8501"
     environment:
-      - PYTHONUNBUFFERED=1
-      - HF_TOKEN=${HF_TOKEN}
-      - DAGSHUB_TOKEN=${DAGSHUB_TOKEN}
-    volumes:
-      - ./data:/air-quality-app/data
-      - ./models:/air-quality-app/models
-      - ./dashboard:/air-quality-app/dashboard
-    command: streamlit run dashboard/air_quality.py --server.port=8501 --server.address=0.0.0.0
-    networks:
-      - air-quality-network
-    restart: unless-stopped
+      <<: *app-env
+      API_URL: http://api:7860
+    command: streamlit run frontend/app_ui.py --server.port=8501 --server.address=0.0.0.0
     depends_on:
       api:
         condition: service_healthy
 
-  # Service Frontend Next.js (optionnel)
-  frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-    container_name: air-quality-frontend
+  dashboard:
+    <<: *app
+    container_name: air-quality-dashboard
     ports:
-      - "3000:3000"
+      - "${DASH_PORT:-8050}:8050"
     environment:
-      - NEXT_PUBLIC_API_URL=http://api:7860
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
-    command: npm run dev
-    networks:
-      - air-quality-network
-    restart: unless-stopped
+      <<: *app-env
+      API_URL: http://api:7860
+      DASH_HOST: 0.0.0.0
+      DASH_PORT: "8050"
+    command: python -m dashboard.air_quality
     depends_on:
-      - api
+      api:
+        condition: service_healthy
 
-  # Service MLflow (optionnel pour le tracking)
   mlflow:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    <<: *app
     container_name: air-quality-mlflow
+    profiles: ["mlflow"]
     ports:
       - "5000:5000"
-    environment:
-      - PYTHONUNBUFFERED=1
     volumes:
       - ./mlruns:/air-quality-app/mlruns
     command: mlflow server --backend-store-uri sqlite:///mlruns/mlflow.db --default-artifact-root /air-quality-app/mlruns/artifacts --host 0.0.0.0 --port 5000
-    networks:
-      - air-quality-network
-    restart: unless-stopped
 
 networks:
   air-quality-network:
     driver: bridge
-
-volumes:
-  data:
-    driver: local
-  models:
-    driver: local
-  logs:
-    driver: local
-
-  redis:
-    image: redis:7-alpine
-    ports:
-      - "6379:6379"
-    command: [ "redis-server", "--appendonly", "yes" ]

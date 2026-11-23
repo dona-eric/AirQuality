@@ -186,3 +186,7 @@ mlflow.db
 sqlite.db
 *.png
 images/
+# Artefacts runtime du pipeline
+data/.last_collect
+val_plot.png
+model.json

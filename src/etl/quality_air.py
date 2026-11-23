@@ -24,7 +24,7 @@ from retry_requests import retry
 # CONFIG
 
 LATITUDE, LONGITUDE = 6.4969, 2.6289  # Cotonou, Bénin
-INTERVAL_MIN    =  20         # Fréquence de mise à jour (heures)
+INTERVAL_HOURS  = 24          # Fréquence de mise à jour (heures)
 BACKFILL_FROM = "2025-09-30"    # Date de début historique
 DB_PATH = pathlib.Path("data/air_quality.db")
 PARQUET_PATH = pathlib.Path("data/air_quality.parquet")
@@ -43,7 +43,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # Client Open‑Meteo avec cache + retry
-cache_session = requests_cache.CachedSession(".cache", expire_after=3600)
+cache_session = requests_cache.CachedSession("data/.cache", expire_after=3600)
 retry_session = retry(cache_session, retries=5, backoff_factor=0.2)
 openmeteo = openmeteo_requests.Client(session=retry_session)
 
@@ -112,9 +112,8 @@ def fetch_air_quality(start_date, end_date):
 
     try:
         responses = openmeteo.weather_api(API_URL, params=params)
-    
-    except requests.RequestException as exc:
-        logger.error("Erreur réseau Open-Meteo : %s", exc)
+    except Exception as exc:  # erreurs réseau ou OpenMeteoRequestsError
+        logger.error("Erreur Open-Meteo : %s", exc)
         return None
     if not responses:
         logger.error("Réponse API vide")
@@ -124,7 +123,6 @@ def fetch_air_quality(start_date, end_date):
 
         # Données horaires dans l'ordre des variables demandées
     hourly = response.Hourly()
-    values = [hourly.Variables(i).ValuesAsNumpy() for i in range(len(HOURLY_FIELDS))]
 
     time_index = pd.date_range(
             start=pd.to_datetime(hourly.Time() + response.UtcOffsetSeconds(), unit="s", utc=True),
@@ -259,7 +257,7 @@ def _next_start_date() -> datetime.date:
 
 
 
-def collect_and_refresh() -> None:
+def collect_and_refresh() -> bool:
     """
     Fonction principale appelée :
       - une fois au démarrage (backfill)
@@ -269,14 +267,17 @@ def collect_and_refresh() -> None:
       1. Calcule la date de début (incrémental)
       2. Appelle l'API
       3. Stocke dans SQLite
-      4. Exporte le CSV frais pour le dashboard
+      4. Exporte le CSV + Parquet frais pour l'API et le dashboard
+
+    Renvoie True si les données sont à jour à la fin de l'appel.
     """
+    init_db()
     start_date = _next_start_date()
     end_date   = datetime.now(timezone.utc).date().isoformat()
  
     if start_date > end_date:
         logger.info("Données déjà à jour (start=%s > end=%s) — rien à faire", start_date, end_date)
-        return
+        return True
  
     logger.info("=== Collecte %s → %s ===", start_date, end_date)
  
@@ -286,8 +287,9 @@ def collect_and_refresh() -> None:
         store_dataframe(df)
         export_format()
         logger.info("=== Collecte terminée ===")
-    else:
-        logger.error("Collecte échouée — aucune donnée reçue de l'API")
+        return True
+    logger.error("Collecte échouée — aucune donnée reçue de l'API")
+    return False
  
 
 
@@ -297,11 +299,11 @@ def start_scheduler():
     scheduler.add_job(
         func=collect_and_refresh,     # fonction à appeler
         trigger="interval",           # type de déclencheur : intervalle fixe
-        minutes=INTERVAL_MIN,             # toutes les 48 heures
+        hours=INTERVAL_HOURS,
         id="air_quality_refresh",     # identifiant unique (utile pour déboguer)
         max_instances=1,              # empêche deux collectes simultanées
         coalesce=True,                # si le programme était éteint, ne rattrape qu'une seule fois
-        next_run_time=datetime.now(timezone.utc) + timedelta(minutes=INTERVAL_MIN),
+        next_run_time=datetime.now(timezone.utc) + timedelta(hours=INTERVAL_HOURS),
         
     )
  
@@ -331,7 +333,7 @@ if __name__ == "__main__":
     # Étape 2 : collecte immédiate (backfill depuis 30 nov 2025 ou suite)
     collect_and_refresh()
 
-    # Lancer la collecte quotidienne en arrière-plan
+    # Lancer la collecte périodique (INTERVAL_HOURS) en arrière-plan
     scheduler = start_scheduler()
 
     print("\n Collecte qualité d'air active. CTRL+C pour arrêter.\n")

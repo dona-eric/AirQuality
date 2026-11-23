@@ -7,9 +7,8 @@ Fusion : visualisations EDA + prévisions IA 24h
 """
 
 import logging
-import sqlite3
+import os
 import pathlib
-import sqlite3
 import warnings
 from streamlit_option_menu import option_menu
 import numpy as np
@@ -236,7 +235,8 @@ CARD_STYLE = {
 
 # 2.========================= CHARGEMENT DONNÉES (mis en cache) ===========================
 
-API_BASE="https://donerick-air-quality.hf.space"
+# URL de l'API : variable d'environnement API_URL (ex. http://localhost:7860 en local)
+API_BASE = os.getenv("API_URL", "https://donerick-air-quality.hf.space").rstrip("/")
 
 @st.cache_data(show_spinner="Chargement des données air…", ttl=7200)
 
@@ -245,7 +245,7 @@ def load_data(api_url: str = API_BASE):
     """Charge les données depuis l'API, avec mise en cache Streamlit."""
 
     try:
-        r = requests.get(f"{api_url.rstrip('/')}/data", timeout=10)
+        r = requests.get(f"{api_url.rstrip('/')}/data", timeout=30)
         r.raise_for_status()
         if r.status_code == 200:
             df = pd.DataFrame(r.json()["records"])
@@ -256,14 +256,17 @@ def load_data(api_url: str = API_BASE):
             st.stop()
     except Exception as e:
         st.warning(f"API inaccessible ({e}), lecture fichier local…")
-        # Fallback local pour le dev
+        # Fallback local pour le dev : Parquet (produit par l'ETL), sinon CSV
         ROOT_DIR = pathlib.Path(__file__).parent.parent
+        PARQUET_PATH = ROOT_DIR / "data" / "air_quality.parquet"
         CSV_PATH = ROOT_DIR / "data" / "raw" / "hourly_quality_air_data.csv"
-        if not CSV_PATH.exists():
+        if PARQUET_PATH.exists():
+            df_raw = pd.read_parquet(PARQUET_PATH).drop(columns=["id", "created_at"], errors="ignore")
+        elif CSV_PATH.exists():
+            df_raw = pd.read_csv(CSV_PATH)
+        else:
             st.error("Aucune source de données disponible.")
             st.stop()
-
-        df_raw = pd.read_csv(CSV_PATH)
         df_raw["date"] = pd.to_datetime(df_raw["date"], utc=True)
         df = df_raw.sort_values("date").reset_index(drop=True)
 
@@ -333,7 +336,7 @@ def compute_aggregates(df):
 # ==================================
 def fetch_prediction(api_url: str=API_BASE):
     try:
-        r = requests.post(f"{api_url}/predict", timeout=5)
+        r = requests.post(f"{api_url}/predict", timeout=30)
         if r.status_code == 200:
             return r.json()
     except Exception:
@@ -343,7 +346,7 @@ def fetch_prediction(api_url: str=API_BASE):
 
 def fetch_history(api_url: str=API_BASE):
     try:
-        r = requests.get(f"{api_url}/history", timeout=5)
+        r = requests.get(f"{api_url}/history", timeout=30)
         if r.status_code == 200:
             return r.json()
     except Exception:
@@ -744,7 +747,7 @@ def fig_map_cotonou(polluant="pm2_5"):
     # On prend les dernières données connues pour la carte
     latest_data = df.tail(100) # Ou un agrégat par zone si tu as plusieurs capteurs
 
-    fig = px.scatter_mapbox(
+    fig = px.scatter_map(
         latest_data,
         lat="lat",
         lon="lon",
@@ -753,7 +756,7 @@ def fig_map_cotonou(polluant="pm2_5"):
         color_continuous_scale="Reds",
         size_max=30,
         zoom=11,
-        mapbox_style="carto-positron", # Style de carte épuré (SaaS style)
+        map_style="carto-positron", # Style de carte épuré (SaaS style)
         title=f"Distribution spatiale : {label}"
     )
     
@@ -823,7 +826,7 @@ with st.sidebar:
 
     st.divider()
     with st.expander("Paramètres API"):
-        api_url = st.text_input("URL", "https://donerick-air-quality.hf.space")
+        api_url = st.text_input("URL", API_BASE).rstrip("/")
         if st.button("Rafraîchir les données", width="stretch"):
             st.cache_data.clear()
             st.rerun()
@@ -891,6 +894,9 @@ if selected_page == "Vue d'ensemble":
         with c3:
             render_kpi("Status", pred.get("aqi_label", "—"),
                        pred.get("conseil", ""), color="#10B981")
+        if pred.get("data_last_update"):
+            st.caption(f"Prévision pour le {pred['date_prevision']} — "
+                       f"données jusqu'au {pred['data_last_update'][:16].replace('T', ' ')} UTC")
 
         if "Mauvais" in str(pred.get("aqi_label", "")):
             st.markdown(
@@ -918,7 +924,7 @@ if selected_page == "Vue d'ensemble":
                                  margin=dict(l=10, r=10, t=10, b=10))
             st.plotly_chart(fig_h, width="stretch")
     else:
-        st.info("💡 API non disponible. Lancez `python main.py` pour activer les prévisions.")
+        st.info("💡 API non disponible. Lancez `uvicorn src.api.main:app --port 7860` pour activer les prévisions.")
 
 
     # — KPIs EDA

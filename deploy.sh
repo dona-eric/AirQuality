@@ -1,51 +1,40 @@
 #!/bin/bash
+# Déploiement local (sans Docker) : API + frontend Streamlit + cron de collecte/ré-entraînement.
 
-# --- CONFIGURATION ---
-APP_DIR=$(pwd)
+APP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 LOG_DIR="$APP_DIR/logs"
-mkdir -p "$LOG_DIR"
-mkdir -p "$APP_DIR/models"
-mkdir -p "$APP_DIR/data/raw"
+API_PORT="${API_PORT:-7860}"
+UI_PORT="${UI_PORT:-8501}"
+mkdir -p "$LOG_DIR" "$APP_DIR/models" "$APP_DIR/data/raw"
+cd "$APP_DIR" || exit 1
 
 echo "🚀 Démarrage du déploiement du système Air Quality Cotonou..."
 
 # 1. Installation des dépendances si nécessaire
 # pip install -r requirements.txt
 
-# 2. Lancement de l'API FastAPI en arrière-plan
-echo "Starting FastAPI server with Model Version: ${MODEL_VERSION:-v1}"
-export MODEL_VERSION=${MODEL_VERSION:-v1}
-nohup uvicorn src.api.main:app --host 0.0.0.0 --port 8000 > "$LOG_DIR/api.log" 2>&1 &
-API_PID=$!
-echo "✅ API lancée avec le PID: $API_PID"
+# 2. Modèle : entraînement si aucun modèle local
+if [ ! -f models/xgb_model.json ]; then
+    echo "Aucun modèle local → entraînement..."
+    python -m src.models.train --no-push >> "$LOG_DIR/pipeline.log" 2>&1
+fi
 
-# 3. Lancement du Frontend Streamlit en arrière-plan
-echo "Starting Streamlit UI..."
-nohup streamlit run frontend/app_ui.py --server.port 8501 > "$LOG_DIR/frontend.log" 2>&1 &
-STR_PID=$!
-echo "✅ Frontend lancé avec le PID: $STR_PID"
+# 3. API FastAPI en arrière-plan
+export MODEL_VERSION="${MODEL_VERSION:-latest}"
+echo "Starting FastAPI server (MODEL_VERSION=$MODEL_VERSION) on port $API_PORT"
+nohup uvicorn src.api.main:app --host 0.0.0.0 --port "$API_PORT" > "$LOG_DIR/api.log" 2>&1 &
+echo "✅ API lancée avec le PID: $!"
 
-# 4. Configuration de la collecte et entraînement (Toutes les 48h)
-# On utilise Crontab pour automatiser le script de collecte/entraînement
-# On crée un script intermédiaire 'job.sh'
+# 4. Frontend Streamlit en arrière-plan, branché sur l'API locale
+echo "Starting Streamlit UI on port $UI_PORT"
+API_URL="http://localhost:$API_PORT" nohup streamlit run frontend/app_ui.py --server.port "$UI_PORT" > "$LOG_DIR/frontend.log" 2>&1 &
+echo "✅ Frontend lancé avec le PID: $!"
 
-#!/bin/bash
-cd $APP_DIR
-echo "\$(date): Lancement de la collecte et du ré-entraînement..." >> $LOG_DIR/pipeline.log
-
-python src/etl/quality_air.py >> $LOG_DIR/pipeline.log 2>&1
-python src/models/inference.py >> $LOG_DIR/pipeline.log 2>&1
-echo "\$(date): Pipeline terminé." >> $LOG_DIR/pipeline.log
-
-
-chmod +x job.sh
-
-# Ajout à la crontab (s'il n'existe pas déjà)
-# '0 0 */2 * *' signifie à minuit tous les 2 jours
-(crontab -l 2>/dev/null | grep -v "job.sh"; echo "0 0 */2 * * $APP_DIR/job.sh") | crontab -
+# 5. Collecte + ré-entraînement conditionnel tous les 2 jours (minuit) via job.sh
+chmod +x "$APP_DIR/job.sh"
+(crontab -l 2>/dev/null | grep -v "job.sh"; echo "0 0 */2 * * \"$APP_DIR/job.sh\"") | crontab -
 
 echo "---"
 echo "✅ Système opérationnel !"
-echo "L'API est sur le port 8000, le Frontend sur le port 8501."
-echo "La collecte et l'entraînement sont planifiés tous les 2 jours."
-echo "Consultez les logs dans le dossier /logs pour le suivi."
+echo "API : http://localhost:$API_PORT/docs — Frontend : http://localhost:$UI_PORT"
+echo "Collecte et ré-entraînement planifiés tous les 2 jours. Logs dans $LOG_DIR"

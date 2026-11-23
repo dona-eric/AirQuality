@@ -1,5 +1,5 @@
 {
-    "timestamp": "2026-05-15T16:10:13.136609+00:00",
+    "timestamp": "2026-11-23T15:22:45.716228+00:00",
     "data_quality": {
         "missing_values_pct": {
             "id": 0.0,
@@ -18,20 +18,33 @@
         },
         "total_rows": 5472,
         "last_update": "2026-05-15T23:00:00+00:00",
-        "anomalies_detected": 0,
         "pm25_range_violation": 0
     },
     "performance": {
-        "mae": 2.1850202069396065,
-        "rmse": 3.0615539033443775,
-        "n_samples": 7
+        "mae": 1.1756275019475395,
+        "rmse": 1.3256293466966136,
+        "mae_persistence": 1.5976190822465082,
+        "n_samples": 7,
+        "period_start": "2026-05-08",
+        "period_end": "2026-05-14"
     },
     "baseline_comparison": {
-        "mae_aqi": 0.9452616077259275,
-        "mae_pm25": 2.092728081217573,
-        "mse_aqi": 2.3403493441440997,
-        "mse_pm": 8.44863456398377
+        "mae_pm25": 3.4716610085460595,
+        "rmse_pm25": 4.856842973151936,
+        "r2_delta": -0.07106804983663895,
+        "mae_persistence": 3.5300926292384114,
+        "n_train": 176,
+        "n_test": 45,
+        "test_start": "2026-03-31",
+        "test_end": "2026-05-14",
+        "skill_vs_persistence": 0.016552432706265274,
+        "trained_at": "2026-11-23T15:20:17.068543+00:00",
+        "version_tag": "20261123-1520",
+        "data_last_update": "2026-05-15T23:00:00+00:00"
     },
     "needs_retraining": false,
-    "reasons": []
+    "reasons": [],
+    "warnings": [
+        "Donn\u00e9es p\u00e9rim\u00e9es : derni\u00e8re mesure le 2026-05-15"
+    ]
 }
