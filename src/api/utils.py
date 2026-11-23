@@ -15,6 +15,7 @@ import dotenv
 import pandas as pd
 
 from src.etl.quality_air import DB_PATH, PARQUET_PATH, collect_and_refresh
+from src.etl.weather import WEATHER_PATH
 
 dotenv.load_dotenv()
 
@@ -22,7 +23,7 @@ REPO_ID = os.getenv("HF_REPO_ID", "donerick/air-quality-storage")
 COLLECT_INTERVAL = timedelta(days=2)              # délai minimum entre deux collectes
 STAMP_FILE = pathlib.Path("data/.last_collect")   # timestamp local de la dernière collecte
 STAMP_REPO_PATH = ".last_collect"                 # chemin du timestamp dans le dataset HF
-DATA_FILES = [DB_PATH, PARQUET_PATH]
+DATA_FILES = [DB_PATH, PARQUET_PATH, WEATHER_PATH]
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
@@ -54,6 +55,16 @@ def get_df_fast() -> pd.DataFrame:
     df = df.set_index("date").sort_index()
     logger.info("Données chargées depuis %s (%d lignes)", source, len(df))
     return df
+
+
+def get_weather_df() -> pd.DataFrame:
+    """Charge la météo horaire (data/weather.parquet), indexée par `date`, ou un DataFrame vide."""
+    if not WEATHER_PATH.exists():
+        logger.error("Fichier météo introuvable : %s", WEATHER_PATH)
+        return pd.DataFrame()
+    df = pd.read_parquet(WEATHER_PATH)
+    df["date"] = pd.to_datetime(df["date"], utc=True)
+    return df.set_index("date").sort_index()
 
 
 # ===================== TIMESTAMP DE COLLECTE =====================

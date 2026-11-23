@@ -1,5 +1,5 @@
 {
-    "timestamp": "2026-11-23T15:22:45.716228+00:00",
+    "timestamp": "2026-11-23T16:04:50.165665+00:00",
     "data_quality": {
         "missing_values_pct": {
             "id": 0.0,
@@ -10,41 +10,39 @@
             "sulphur_dioxide": 0.0,
             "ozone": 0.0,
             "nitrogen_dioxide": 0.0,
-            "formaldehyde": 0.7719298245614035,
+            "formaldehyde": 0.41904761904761906,
             "methane": 0.0,
             "european_aqi": 0.0,
             "european_aqi_pm2_5": 0.0,
             "created_at": 0.0
         },
-        "total_rows": 5472,
-        "last_update": "2026-05-15T23:00:00+00:00",
+        "total_rows": 10080,
+        "last_update": "2026-11-23T23:00:00+00:00",
         "pm25_range_violation": 0
     },
     "performance": {
-        "mae": 1.1756275019475395,
-        "rmse": 1.3256293466966136,
-        "mae_persistence": 1.5976190822465082,
+        "mae": 2.131632042782647,
+        "rmse": 2.4762418539636335,
+        "mae_persistence": 2.5023809330804014,
         "n_samples": 7,
-        "period_start": "2026-05-08",
-        "period_end": "2026-05-14"
+        "period_start": "2026-11-16",
+        "period_end": "2026-11-22"
     },
     "baseline_comparison": {
-        "mae_pm25": 3.4716610085460595,
-        "rmse_pm25": 4.856842973151936,
-        "r2_delta": -0.07106804983663895,
-        "mae_persistence": 3.5300926292384114,
-        "n_train": 176,
-        "n_test": 45,
-        "test_start": "2026-03-31",
-        "test_end": "2026-05-14",
-        "skill_vs_persistence": 0.016552432706265274,
-        "trained_at": "2026-11-23T15:20:17.068543+00:00",
-        "version_tag": "20261123-1520",
-        "data_last_update": "2026-05-15T23:00:00+00:00"
+        "mae_pm25": 2.777673390779989,
+        "rmse_pm25": 3.8570751084427206,
+        "r2_delta": 0.4104802147163614,
+        "mae_persistence": 3.4971887462110405,
+        "n_train": 330,
+        "n_test": 83,
+        "test_start": "2026-09-01",
+        "test_end": "2026-11-22",
+        "skill_vs_persistence": 0.20574107022693477,
+        "trained_at": "2026-11-23T16:04:14.773771+00:00",
+        "version_tag": "20261123-1604",
+        "data_last_update": "2026-11-23T23:00:00+00:00"
     },
     "needs_retraining": false,
     "reasons": [],
-    "warnings": [
-        "Donn\u00e9es p\u00e9rim\u00e9es : derni\u00e8re mesure le 2026-05-15"
-    ]
+    "warnings": []
 }

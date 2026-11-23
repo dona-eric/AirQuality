@@ -23,7 +23,7 @@ import uvicorn
 from fastapi import FastAPI, HTTPException, Query
 
 from src.api.schemas import DataResponse, HealthResponse, HistoryResponse, PredictionResponse
-from src.api.utils import download_data_from_hf, etl_task_if_needed, get_df_fast
+from src.api.utils import download_data_from_hf, etl_task_if_needed, get_df_fast, get_weather_df
 from src.models.features import InsufficientDataError
 from src.models.inference import predict_next_day
 from src.models.registry import load_model
@@ -134,7 +134,7 @@ def predict():
         raise HTTPException(status_code=503, detail="Modèle non disponible. Entraînez-le : python -m src.models.train")
     df = _load_data()
     try:
-        result = predict_next_day(state["model"], df)
+        result = predict_next_day(state["model"], df, get_weather_df())
     except InsufficientDataError as e:
         raise HTTPException(status_code=503, detail=str(e))
     except Exception as e:
