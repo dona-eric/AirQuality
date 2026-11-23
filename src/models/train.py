@@ -9,7 +9,7 @@ Usage :
     python -m src.models.train --no-push       # sans publication HuggingFace
 
 Étapes :
-  1. Features + cible (src/models/features.py)
+  1. Features + cible (src/models/features.py) : qualité d'air + météo (src/etl/weather.py)
   2. Split chronologique 80/20 → métriques sur la période la plus récente,
      comparées à la baseline de persistance (« demain = aujourd'hui »)
   3. Ré-entraînement sur 100 % des données → modèle de production
@@ -60,9 +60,10 @@ def make_model(params: dict) -> xgb.XGBRegressor:
     return xgb.XGBRegressor(objective="reg:squarederror", random_state=42, **params)
 
 
-def train_model(df_hourly: pd.DataFrame, params: dict, test_ratio: float = TEST_RATIO):
+def train_model(df_hourly: pd.DataFrame, weather_hourly: pd.DataFrame, params: dict,
+                test_ratio: float = TEST_RATIO):
     """Renvoie (modèle_production, métriques, données_validation)."""
-    X, y = build_training_frame(df_hourly)
+    X, y = build_training_frame(df_hourly, weather_hourly)
 
     split_idx = int(len(X) * (1 - test_ratio))
     if split_idx < 10 or len(X) - split_idx < 2:
@@ -169,7 +170,7 @@ def main(argv=None) -> dict:
 
     import dotenv
 
-    from src.api.utils import get_df_fast
+    from src.api.utils import get_df_fast, get_weather_df
 
     dotenv.load_dotenv()
 
@@ -177,7 +178,7 @@ def main(argv=None) -> dict:
     params = load_params()
     version_tag = datetime.now(timezone.utc).strftime("%Y%m%d-%H%M")
 
-    model, metrics, (X_test, y_test, y_pred) = train_model(df, params)
+    model, metrics, (X_test, y_test, y_pred) = train_model(df, get_weather_df(), params)
     metrics.update({
         "trained_at": datetime.now(timezone.utc).isoformat(),
         "version_tag": version_tag,

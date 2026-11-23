@@ -268,9 +268,17 @@ def collect_and_refresh() -> bool:
       2. Appelle l'API
       3. Stocke dans SQLite
       4. Exporte le CSV + Parquet frais pour l'API et le dashboard
+      5. Rafraîchit les prévisions météo (features du modèle)
 
-    Renvoie True si les données sont à jour à la fin de l'appel.
+    Renvoie True si qualité d'air ET météo sont à jour à la fin de l'appel.
     """
+    from src.etl.weather import collect_weather  # import local : évite l'import circulaire
+
+    # `&` (et non `and`) : la météo est collectée même si la qualité d'air échoue
+    return _collect_air_quality() & collect_weather()
+
+
+def _collect_air_quality() -> bool:
     init_db()
     start_date = _next_start_date()
     end_date   = datetime.now(timezone.utc).date().isoformat()

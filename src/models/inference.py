@@ -25,9 +25,9 @@ def get_aqi_info(value: float) -> tuple[str, str]:
         return "Très Mauvais", "Alerte pollution. Limitez les sorties non essentielles."
 
 
-def predict_next_day(model, df_hourly: pd.DataFrame) -> dict:
+def predict_next_day(model, df_hourly: pd.DataFrame, weather_hourly: pd.DataFrame) -> dict:
     """Prévoit le PM2.5 moyen du lendemain du dernier jour présent dans les données."""
-    X, current_pm25, last_day = build_inference_row(df_hourly)
+    X, current_pm25, last_day = build_inference_row(df_hourly, weather_hourly)
 
     delta = float(model.predict(X)[0])
     predicted = max(current_pm25 + delta, 0.0)  # une concentration ne peut pas être négative
@@ -45,7 +45,7 @@ def predict_next_day(model, df_hourly: pd.DataFrame) -> dict:
 
 
 if __name__ == "__main__":
-    from src.api.utils import get_df_fast
+    from src.api.utils import get_df_fast, get_weather_df
     from src.models.registry import load_model
 
     logging.basicConfig(level=logging.INFO)
@@ -53,7 +53,7 @@ if __name__ == "__main__":
     if model is None:
         raise SystemExit("Aucun modèle disponible. Lancez d'abord : python -m src.models.train")
 
-    res = predict_next_day(model, get_df_fast())
+    res = predict_next_day(model, get_df_fast(), get_weather_df())
     print("\n" + "=" * 40)
     print(f"RÉSULTATS POUR LE {res['date_prevision']} À COTONOU  (modèle {source})")
     print(f"Valeur actuelle  : {res['current_pm25']:.2f} µg/m³")

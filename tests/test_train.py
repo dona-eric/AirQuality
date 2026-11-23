@@ -10,8 +10,8 @@ FAST_PARAMS = {"n_estimators": 20, "max_depth": 2, "learning_rate": 0.1, "n_jobs
 
 
 @pytest.fixture
-def trained(hourly_df):
-    return train_model(hourly_df, FAST_PARAMS)
+def trained(hourly_df, weather_df):
+    return train_model(hourly_df, weather_df, FAST_PARAMS)
 
 
 def test_train_returns_metrics(trained):
@@ -28,18 +28,18 @@ def test_params_yaml_is_read():
     assert "max_depth" in params
 
 
-def test_save_load_roundtrip(trained, hourly_df, tmp_path):
+def test_save_load_roundtrip(trained, hourly_df, weather_df, tmp_path):
     model = trained[0]
     path = save_model(model, tmp_path / "m.json")
     loaded, source = load_model(local_path=path)
     assert source == f"local:{path}"
-    assert predict_next_day(loaded, hourly_df) == predict_next_day(model, hourly_df)
+    assert predict_next_day(loaded, hourly_df, weather_df) == predict_next_day(model, hourly_df, weather_df)
 
 
-def test_incompatible_model_is_rejected(hourly_df, tmp_path):
+def test_incompatible_model_is_rejected(hourly_df, weather_df, tmp_path):
     from src.models.features import build_training_frame
 
-    X, y = build_training_frame(hourly_df)
+    X, y = build_training_frame(hourly_df, weather_df)
     X = X.assign(formaldehyde=0.0)  # ancien jeu de features
     path = tmp_path / "old.json"
     xgb.XGBRegressor(n_estimators=2).fit(X, y).save_model(str(path))
@@ -47,8 +47,8 @@ def test_incompatible_model_is_rejected(hourly_df, tmp_path):
         _read_model(path)
 
 
-def test_prediction_payload(trained, hourly_df):
-    res = predict_next_day(trained[0], hourly_df)
+def test_prediction_payload(trained, hourly_df, weather_df):
+    res = predict_next_day(trained[0], hourly_df, weather_df)
     assert res["predicted_pm25"] >= 0
     assert res["delta"] == pytest.approx(res["predicted_pm25"] - res["current_pm25"], abs=0.011)
     assert res["date_prevision"] > hourly_df.index.max().strftime("%Y-%m-%d")
