@@ -1,121 +1,157 @@
-from fastapi import FastAPI, HTTPException
-import pandas as pd
-import joblib
-import os
-import uvicorn
+"""
+main.py
+=======
+API FastAPI — prévision du PM2.5 à J+1 à Cotonou.
+
+Lancement : uvicorn src.api.main:app --host 0.0.0.0 --port 7860
+
+Variables d'environnement :
+  MODEL_VERSION         "latest" (défaut) ou tag HF (voir src/models/registry.py)
+  ENABLE_ETL_SCHEDULER  "1" pour synchroniser HF + collecter Open-Meteo toutes les 12 h
+  HF_TOKEN              accès au dataset HF (données + modèle)
+"""
+
 import json
+import logging
+import os
 import pathlib
-from typing import List, Dict
-from src.api.utils import get_df_fast
-from src.api.schemas import PredictionResponse, HistoryResponse
+import threading
+from contextlib import asynccontextmanager
 
-app = FastAPI(title="Cotonou Air Quality API", description="Prévision des PM2.5 à 24h")
+import numpy as np
+import uvicorn
+from fastapi import FastAPI, HTTPException, Query
 
-# Chemins structurés
-BASE_DIR = pathlib.Path(__file__).parent
-MODEL_PATH = pathlib.Path("models/air_quality.pkl")
-MODEL_VERSION = os.getenv("MODEL_VERSION", "v1")
+from src.api.schemas import DataResponse, HealthResponse, HistoryResponse, PredictionResponse
+from src.api.utils import download_data_from_hf, etl_task_if_needed, get_df_fast
+from src.models.features import InsufficientDataError
+from src.models.inference import predict_next_day
+from src.models.registry import load_model
 
-# Chargement du modèle au démarrage
-model = None
-if MODEL_PATH.exists() and MODEL_VERSION == "v1":
-    model = joblib.load(MODEL_PATH)
-    print(f"Modèle local v1 chargé depuis {MODEL_PATH}")
-else:
-    # Tentative de chargement depuis HuggingFace (pour v2 ou si local absent)
-    from src.api.utils import load_model_from_hf
-    model = load_model_from_hf(version=MODEL_VERSION)
-    if model:
-        print(f"Modèle {MODEL_VERSION} chargé depuis HuggingFace")
+logger = logging.getLogger(__name__)
+
+MONITORING_REPORT_PATH = pathlib.Path("models/monitoring_report.json")
+ETL_CHECK_HOURS = 12
+
+# État partagé, rempli au démarrage (lifespan) — modifiable dans les tests
+state = {"model": None, "model_source": None, "scheduler": None}
+
+
+def _start_etl_scheduler():
+    from apscheduler.schedulers.background import BackgroundScheduler
+
+    def bootstrap():
+        download_data_from_hf()
+        etl_task_if_needed()
+
+    # Premier passage en arrière-plan pour ne pas bloquer le démarrage
+    threading.Thread(target=bootstrap, daemon=True).start()
+
+    scheduler = BackgroundScheduler(timezone="UTC")
+    scheduler.add_job(etl_task_if_needed, "interval", hours=ETL_CHECK_HOURS,
+                      id="etl", max_instances=1, coalesce=True)
+    scheduler.start()
+    logger.info("Scheduler ETL démarré (vérification toutes les %d h)", ETL_CHECK_HOURS)
+    return scheduler
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    state["model"], state["model_source"] = load_model()
+    if state["model"] is None:
+        logger.error("Aucun modèle chargé : /predict renverra 503.")
     else:
-        print(f"Échec du chargement du modèle {MODEL_VERSION}")
+        logger.info("Modèle chargé (%s)", state["model_source"])
 
-def get_aqi_info(value):
-    if value <= 12: return "Bon", "L'air est pur. Idéal pour les activités extérieures."
-    elif value <= 35: return "Modéré", "Qualité acceptable. Les personnes très sensibles devraient limiter les efforts prolongés."
-    elif value <= 55: return "Mauvais", "Port du masque recommandé près des grands axes (Étoile Rouge, Dantokpa)."
-    else: return "Très Mauvais", "Alerte pollution. Limitez les sorties non essentielles."
+    if os.getenv("ENABLE_ETL_SCHEDULER", "0").lower() in ("1", "true", "yes"):
+        state["scheduler"] = _start_etl_scheduler()
+    yield
+    if state["scheduler"]:
+        state["scheduler"].shutdown(wait=False)
+
+
+app = FastAPI(
+    title="Cotonou Air Quality API",
+    description="Prévision du PM2.5 moyen à J+1",
+    lifespan=lifespan,
+)
+
+
+def _load_data():
+    df = get_df_fast()
+    if df.empty:
+        raise HTTPException(status_code=503, detail="Aucune donnée disponible. Lancez l'ETL.")
+    return df
+
 
 @app.get("/")
 def home():
     return {
         "status": "online",
-        "model_loaded": model is not None,
-        "message": "API de prévision de la qualité de l'air à Cotonou"
+        "model_loaded": state["model"] is not None,
+        "message": "API de prévision de la qualité de l'air à Cotonou",
     }
 
-@app.get("/monitoring")
-def get_monitoring():
-    """Renvoie le dernier rapport de monitoring."""
-    report_path = pathlib.Path("models/monitoring_report.json")
-    if not report_path.exists():
-        # Lancer le monitoring s'il n'existe pas
-        from src.models.monitoring import check_monitoring
-        return check_monitoring()
 
-    with open(report_path, "r") as f:
-        return json.load(f)
+@app.get("/health", response_model=HealthResponse)
+def health():
+    df = get_df_fast()
+    return {
+        "status": "ok",
+        "model_loaded": state["model"] is not None,
+        "model_source": state["model_source"],
+        "data_rows": int(len(df)),
+        "data_last_update": df.index.max().isoformat() if not df.empty else None,
+    }
+
+
+@app.get("/data", response_model=DataResponse)
+def get_data(days: int | None = Query(None, ge=1, description="Limiter aux N derniers jours")):
+    """Mesures horaires brutes (utilisées par le frontend Streamlit)."""
+    df = _load_data()
+    if days:
+        df = df[df.index >= df.index.max() - np.timedelta64(days, "D")]
+    out = df.drop(columns=["id", "created_at"], errors="ignore").reset_index()
+    out["date"] = out["date"].map(lambda d: d.isoformat())
+    out = out.astype(object).where(out.notna(), None)
+    return {"count": len(out), "records": out.to_dict(orient="records")}
+
 
 @app.get("/history", response_model=HistoryResponse)
 def get_history():
-    """Renvoie les 7 derniers jours de mesures réelles."""
-    try:
-        df = get_df_fast()
-        df_daily = df.resample('D').mean(numeric_only=True).tail(7)
-        
-        return {
-            "dates": [d.strftime('%Y-%m-%d') for d in df_daily.index],
-            "values": [round(v, 2) for v in df_daily['pm2_5']]
-        }
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    """Moyenne journalière du PM2.5 sur les 7 derniers jours."""
+    df = _load_data()
+    daily = df["pm2_5"].resample("D").mean().tail(7)
+    return {
+        "dates": [d.strftime("%Y-%m-%d") for d in daily.index],
+        "values": [None if np.isnan(v) else round(float(v), 2) for v in daily],
+    }
 
-@app.post("/predict", response_model=PredictionResponse)
+
+@app.api_route("/predict", methods=["GET", "POST"], response_model=PredictionResponse)
 def predict():
-    if model is None:
-        raise HTTPException(status_code=500, detail="Modèle non trouvé. Vérifiez le dossier 'models/'.")
-
+    if state["model"] is None:
+        raise HTTPException(status_code=503, detail="Modèle non disponible. Entraînez-le : python -m src.models.train")
+    df = _load_data()
     try:
-        df = get_df_fast()
-        
-        df_daily = df.resample('D').mean(numeric_only=True).interpolate()
-        recent = df_daily.tail(10).copy()
-        
-        # Feature Engineering (Identique à l'entraînement)
-        for i in range(1, 4):
-            recent[f'pm25_lag_{i}'] = recent['pm2_5'].shift(i)
-            recent[f'co_lag_{i}'] = recent['carbon_monoxide'].shift(i)
-        recent['pm25_rolling_7d'] = recent['pm2_5'].rolling(window=7).mean()
-        recent['day_of_week'] = recent.index.dayofweek
-        recent['month'] = recent.index.month
-        
-        # Sélection de la ligne la plus récente pour la prédiction
-        X_input = recent.tail(1).drop(columns=['formaldehyde', 'id'], errors='ignore')
-        
-        # Vérification des features attendues par le modèle
-        if hasattr(model, 'feature_names_in_'):
-            X_input = X_input[model.feature_names_in_]
-
-        # Vérification qu'il n'y a pas de NaN (important pour XGBoost)
-        if X_input.isnull().values.any():
-            raise ValueError("Données historiques insuffisantes pour générer les lags.")
-
-        current_pm25 = recent['pm2_5'].iloc[-1]
-        delta_pred = float(model.predict(X_input)[0])
-        final_pred = current_pm25 + delta_pred
-        
-        label, conseil = get_aqi_info(final_pred)
-        
-        return {
-            "date_prevision": (recent.index[-1] + pd.Timedelta(days=1)).strftime('%Y-%m-%d'),
-            "current_pm25": round(current_pm25, 2),
-            "predicted_pm25": round(final_pred, 2),
-            "delta": round(delta_pred, 2),
-            "aqi_label": label,
-            "conseil": conseil
-        }
+        result = predict_next_day(state["model"], df)
+    except InsufficientDataError as e:
+        raise HTTPException(status_code=503, detail=str(e))
     except Exception as e:
+        logger.exception("Erreur de prédiction")
         raise HTTPException(status_code=500, detail=str(e))
+    return {**result, "model_source": state["model_source"]}
+
+
+@app.get("/monitoring")
+def get_monitoring(refresh: bool = False):
+    """Dernier rapport de monitoring (recalculé si absent ou si refresh=true)."""
+    if refresh or not MONITORING_REPORT_PATH.exists():
+        from src.models.monitoring import NpEncoder, check_monitoring
+
+        return json.loads(json.dumps(check_monitoring(model=state["model"]), cls=NpEncoder))
+    return json.loads(MONITORING_REPORT_PATH.read_text())
+
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=7860)

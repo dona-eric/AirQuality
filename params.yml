@@ -1,6 +1,12 @@
-# parametres pour le modèle
+# parametres pour le modèle (lus par src/models/train.py)
+# Choisis par validation croisée temporelle (5 folds × 20 jours) :
+#   MAE 3.06 µg/m³ vs 3.13 pour la persistance « demain = aujourd'hui »
+#   (l'ancienne config 500 arbres / profondeur 5 donnait 3.30, pire que la persistance)
 model_params:
-  n_estimators: 500
-  learning_rate: 0.05
-  max_depth: 5
+  n_estimators: 300
+  learning_rate: 0.03
+  max_depth: 2
   subsample: 0.8
+  colsample_bytree: 0.8
+  min_child_weight: 5
+  reg_lambda: 5

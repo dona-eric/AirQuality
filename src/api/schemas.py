@@ -1,11 +1,12 @@
+from typing import Any, Dict, List, Optional
+
 from pydantic import BaseModel
-from typing import List
+
 
 class DataResponse(BaseModel):
-    dates: List[str]
-    pm2_5: List[float]
-    pm10: List[float]
-    european_aqi: List[float]
+    count: int
+    records: List[Dict[str, Any]]
+
 
 class PredictionResponse(BaseModel):
     date_prevision: str
@@ -14,7 +15,18 @@ class PredictionResponse(BaseModel):
     delta: float
     aqi_label: str
     conseil: str
+    data_last_update: Optional[str] = None
+    model_source: Optional[str] = None
+
 
 class HistoryResponse(BaseModel):
     dates: List[str]
-    values: List[float]
+    values: List[Optional[float]]
+
+
+class HealthResponse(BaseModel):
+    status: str
+    model_loaded: bool
+    model_source: Optional[str] = None
+    data_rows: int
+    data_last_update: Optional[str] = None

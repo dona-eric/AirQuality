@@ -6,11 +6,7 @@ Données : Open-Meteo Air Quality API — Sept 2025 → Mars 2026
 
 """
 
-from turtle import st
-
-from turtle import st
-
-from fastapi import requests
+import os
 import numpy as np
 import pandas as pd
 import plotly.express as px
@@ -41,9 +37,14 @@ logger.info("╚═════════════════════�
 logger.info("1. CHARGEMENT & PRÉPARATION")
 
 CSV_PATH = pathlib.Path("data/raw/hourly_quality_air_data.csv")
+PARQUET_PATH = pathlib.Path("data/air_quality.parquet")
+API_URL = os.getenv("API_URL", "http://127.0.0.1:7860").rstrip("/")
 
 try:
-    df_raw = pd.read_csv(CSV_PATH)
+    if CSV_PATH.exists():
+        df_raw = pd.read_csv(CSV_PATH)
+    else:
+        df_raw = pd.read_parquet(PARQUET_PATH).drop(columns=["id", "created_at"], errors="ignore")
     df_raw["date"] = pd.to_datetime(df_raw["date"], utc=True)
     df = df_raw.sort_values("date").reset_index(drop=True)
 
@@ -59,7 +60,8 @@ try:
     logger.info("=========== TRANFORMATION DES DONNÉES SUCCESSFUL=============")
 
 except Exception as e:
-    logger.error(f"======= ERROR FILE {CSV_PATH} doesn't exist============")
+    logger.error(f"======= Données introuvables ({CSV_PATH} / {PARQUET_PATH}) : {e} ============")
+    raise SystemExit("Lancez d'abord l'ETL : python -m src.etl.quality_air")
 
 
 
@@ -74,11 +76,12 @@ df["saison"] = df["month"].apply(
 #================================= PREDICTION ======================================
 
 def prediction():
-    api_url = "http://127.0.0.1:8000"
+    """Renvoie (prévision, valeur actuelle) formatées, ou ("—", "—") si l'API est injoignable."""
+    api_url = API_URL
 
     try:
     # Appel à l'endpoint de prédiction
-        response = requests.post(f"{api_url}/predict")
+        response = requests.post(f"{api_url}/predict", timeout=30)
         if response.status_code == 200:
             data = response.json()
             Prevision = f"{data['predicted_pm25']} µg/m³"
@@ -88,6 +91,7 @@ def prediction():
             logger.error("Erreur lors de la connexion à l'API de prédiction.")
     except Exception as e:
         logger.warning("L'API n'est pas encore lancée.")
+    return "—", "—"
 
 prevision, pm2_5_actual = prediction()
 
@@ -903,7 +907,7 @@ app.layout = html.Div(
         #  KPIs 
         html.Div([
             html.Div([
-            kpi_card('Prédiction AQI', f"{prevision}", f"Actuel: {pm2_5_actual}", C["accent"]),
+            kpi_card('Prévision PM2.5 J+1', f"{prevision}", f"Actuel: {pm2_5_actual}", C["accent"]),
             kpi_card("Indice AQI", f"{AQI}", aqi_label, aqi_color),
             kpi_card("PM2.5 Moyen", f"{pm2_5_mean} μg/m³", f"P95: {pm2_5_p95}", C["coral"]),
             kpi_card("PM10 Moyen", f"{pm_10_mean} μg/m³", "Données 24h", C["warning"]),
@@ -1103,6 +1107,6 @@ if __name__ == "__main__":
     print("Dashboard: Qualité d'air Cotonou")
     print("="*55 + "\n")
     app.run(
-        debug=True, 
-        host="127.0.0.1", 
-        port=8081, dev_tools_ui=True,)
+        debug=os.getenv("DASH_DEBUG", "0") == "1",
+        host=os.getenv("DASH_HOST", "127.0.0.1"),
+        port=int(os.getenv("DASH_PORT", "8081")), dev_tools_ui=True,)
