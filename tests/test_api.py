@@ -4,15 +4,16 @@ from fastapi.testclient import TestClient
 
 from src.api import main
 from src.models.train import train_model
-from tests.conftest import make_hourly
+from tests.conftest import make_hourly, make_weather
 
 
 @pytest.fixture
 def client(monkeypatch):
-    df = make_hourly()
-    model = train_model(df, {"n_estimators": 10, "max_depth": 2, "n_jobs": 1})[0]
+    df, weather = make_hourly(), make_weather()
+    model = train_model(df, weather, {"n_estimators": 10, "max_depth": 2, "n_jobs": 1})[0]
     monkeypatch.setattr(main, "load_model", lambda: (model, "test"))
     monkeypatch.setattr(main, "get_df_fast", lambda: df.copy())
+    monkeypatch.setattr(main, "get_weather_df", lambda: weather.copy())
     monkeypatch.setenv("ENABLE_ETL_SCHEDULER", "0")
     with TestClient(main.app) as c:
         yield c, df

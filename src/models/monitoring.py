@@ -14,7 +14,7 @@ import numpy as np
 import pandas as pd
 from sklearn.metrics import mean_absolute_error, mean_squared_error
 
-from src.api.utils import get_df_fast
+from src.api.utils import get_df_fast, get_weather_df
 from src.models.features import FEATURE_COLUMNS, TARGET_COLUMN, InsufficientDataError, build_supervised_frame
 from src.models.registry import load_model
 
@@ -49,7 +49,8 @@ def run_data_quality_checks(df: pd.DataFrame) -> dict:
     return checks
 
 
-def calculate_recent_performance(model, df: pd.DataFrame, n_days: int = BACKTEST_DAYS) -> dict | None:
+def calculate_recent_performance(model, df: pd.DataFrame, weather: pd.DataFrame,
+                                 n_days: int = BACKTEST_DAYS) -> dict | None:
     """Backtest sur les `n_days` derniers jours dont on connaît le lendemain.
 
     NB : si le modèle a été ré-entraîné après ces jours, ils font partie de son
@@ -57,7 +58,7 @@ def calculate_recent_performance(model, df: pd.DataFrame, n_days: int = BACKTEST
     les jours collectés APRÈS le dernier entraînement.
     """
     try:
-        frame = build_supervised_frame(df).tail(n_days)
+        frame = build_supervised_frame(df, weather).tail(n_days)
     except InsufficientDataError:
         return None
     if frame.empty:
@@ -77,14 +78,15 @@ def calculate_recent_performance(model, df: pd.DataFrame, n_days: int = BACKTEST
     }
 
 
-def check_monitoring(model=None, df: pd.DataFrame | None = None) -> dict:
+def check_monitoring(model=None, df: pd.DataFrame | None = None, weather: pd.DataFrame | None = None) -> dict:
     """Produit et sauvegarde le rapport de monitoring."""
     df = get_df_fast() if df is None else df
+    weather = get_weather_df() if weather is None else weather
     if model is None:
         model, _ = load_model()
 
     dq_report = run_data_quality_checks(df)
-    perf_report = calculate_recent_performance(model, df) if model is not None else None
+    perf_report = calculate_recent_performance(model, df, weather) if model is not None else None
 
     baseline = {}
     if BASELINE_METRICS_PATH.exists():

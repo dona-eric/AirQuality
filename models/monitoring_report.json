@@ -1,5 +1,5 @@
 {
-    "timestamp": "2026-11-23T15:43:24.373843+00:00",
+    "timestamp": "2026-11-23T16:04:50.165665+00:00",
     "data_quality": {
         "missing_values_pct": {
             "id": 0.0,
@@ -21,25 +21,25 @@
         "pm25_range_violation": 0
     },
     "performance": {
-        "mae": 1.916201167163395,
-        "rmse": 2.461797461302092,
+        "mae": 2.131632042782647,
+        "rmse": 2.4762418539636335,
         "mae_persistence": 2.5023809330804014,
         "n_samples": 7,
         "period_start": "2026-11-16",
         "period_end": "2026-11-22"
     },
     "baseline_comparison": {
-        "mae_pm25": 3.3850048274460085,
-        "rmse_pm25": 4.881337555025673,
-        "r2_delta": 0.055808958150902255,
+        "mae_pm25": 2.777673390779989,
+        "rmse_pm25": 3.8570751084427206,
+        "r2_delta": 0.4104802147163614,
         "mae_persistence": 3.4971887462110405,
         "n_train": 330,
         "n_test": 83,
         "test_start": "2026-09-01",
         "test_end": "2026-11-22",
-        "skill_vs_persistence": 0.03207831401338446,
-        "trained_at": "2026-11-23T15:43:16.918590+00:00",
-        "version_tag": "20261123-1543",
+        "skill_vs_persistence": 0.20574107022693477,
+        "trained_at": "2026-11-23T16:04:14.773771+00:00",
+        "version_tag": "20261123-1604",
         "data_last_update": "2026-11-23T23:00:00+00:00"
     },
     "needs_retraining": false,
